@@ -8,8 +8,6 @@ package com.learn.shirologin.ui.user.view;
 import com.learn.shirologin.model.UserInfo;
 import com.learn.shirologin.service.UserInfoService;
 import com.learn.shirologin.ui.user.model.UserTableModel;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.swing.JButton;
@@ -35,6 +33,7 @@ public class UserPanel extends JPanel{
     private JComboBox<String> cbxPagePerSize;
     private JButton btnPrevious;
     private JButton btnFirst;
+    private JButton btnNew;
     private JTable tableUser;
     
     @Autowired private UserInfoService userInfoService;
@@ -57,21 +56,13 @@ public class UserPanel extends JPanel{
 
     private JPanel createPanelPagination() {
         JPanel panel = new JPanel();
-        MigLayout migLayout = new MigLayout("wrap 5","[][][][][]");
+        MigLayout migLayout = new MigLayout("wrap 2","[grow][]");
         panel.setLayout(migLayout);
         
-        btnLast = new JButton("Last");
-        btnNext = new JButton("Next");
-        cbxPagePerSize = new JComboBox<>();
-        btnPrevious = new JButton("Previous");
-        btnFirst = new JButton("First");
-        
-        panel.add(btnLast);
-        panel.add(btnNext);
-        panel.add(cbxPagePerSize);
-        panel.add(btnPrevious);
-        panel.add(btnFirst);
-        
+        JPanel panelLeft = createPanelLeftPagination();
+        panel.add(panelLeft,"left");
+        panel.add(btnNew,"right");
+       
         return panel;
     }
     
@@ -96,6 +87,24 @@ public class UserPanel extends JPanel{
         
         JScrollPane paneWithTable = new JScrollPane(tableUser);
         return paneWithTable;
+    }
+
+    private JPanel createPanelLeftPagination() {
+        JPanel panel = new JPanel();
+        btnLast = new JButton("Last");
+        btnNext = new JButton("Next");
+        cbxPagePerSize = new JComboBox<>();
+        btnPrevious = new JButton("Previous");
+        btnFirst = new JButton("First");
+        btnNew = new JButton("New");
+        
+        panel.add(btnLast);
+        panel.add(btnNext);
+        panel.add(cbxPagePerSize);
+        panel.add(btnPrevious);
+        panel.add(btnFirst);
+        
+        return panel;
     }
     
 }
