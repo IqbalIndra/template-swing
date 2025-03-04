@@ -5,12 +5,15 @@
  */
 package com.learn.shirologin.ui.user.controller;
 
+import com.learn.shirologin.model.Role;
 import com.learn.shirologin.model.UserInfo;
 import com.learn.shirologin.service.UserInfoService;
 import com.learn.shirologin.ui.base.controller.AbstractPanelController;
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
+import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.ui.user.model.UserTableModel;
 import com.learn.shirologin.ui.user.view.UserTablePaginationPanel;
+import com.learn.shirologin.ui.user.view.modal.UserInfoFormDialog;
 import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import javax.annotation.PostConstruct;
@@ -31,8 +34,10 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class UserController extends AbstractPanelController{
     private final UserTablePaginationPanel userTablePaginationPanel;
+    private final UserInfoFormDialog userInfoFormDialog;
     private final UserTableModel userTableModel;
     private final UserPaginationComboBoxModel userPaginationComboBoxModel;
+    private final UserRoleComboBoxModel userRoleComboBoxModel;
     private final UserInfoService userInfoService;
     private Page<UserInfo> pageUserInfo;
     
@@ -73,7 +78,7 @@ public class UserController extends AbstractPanelController{
     }
 
     private void showNewData() {
-        
+        userInfoFormDialog.setVisible(true);
     }
 
     private void loadEntities(Pageable pageable) {
@@ -88,6 +93,7 @@ public class UserController extends AbstractPanelController{
         Pageable pageable = PageRequest.of(0, 10);
         loadEntities(pageable);
         loadPaginationComboBox();
+        loadRoleComboBox();
         return userTablePaginationPanel;
     }
 
@@ -108,6 +114,10 @@ public class UserController extends AbstractPanelController{
             Pageable pageable = PageRequest.of(pageUserInfo.getNumber(), pageSize);
             loadEntities(pageable);
         }
+    }
+
+    private void loadRoleComboBox() {
+        userRoleComboBoxModel.addElements(Arrays.asList(Role.values()));
     }
     
 }
