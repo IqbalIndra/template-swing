@@ -14,6 +14,8 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -39,6 +41,11 @@ public class UserInfoServiceImpl implements UserInfoService{
     @Override
     public List<UserInfo> getAllUserInfo() {
         return userInfoRepository.findAll();
+    }
+
+    @Override
+    public Page<UserInfo> getAllUserInfo(Pageable pageable) {
+        return userInfoRepository.findByPagination(pageable);
     }
     
 }

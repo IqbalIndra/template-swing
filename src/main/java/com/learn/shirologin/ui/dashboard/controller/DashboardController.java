@@ -8,15 +8,13 @@ package com.learn.shirologin.ui.dashboard.controller;
 import com.learn.shirologin.domain.menu.model.TreeMenu;
 import com.learn.shirologin.domain.menu.service.TreeMenuService;
 import com.learn.shirologin.ui.base.controller.AbstractFrameController;
+import com.learn.shirologin.ui.base.controller.AbstractPanelController;
 import com.learn.shirologin.ui.dashboard.view.DashboardPanel;
 import com.learn.shirologin.ui.main.view.MainFrame;
 import com.learn.shirologin.util.ApplicationContextHolder;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTree;
@@ -68,7 +66,7 @@ public class DashboardController extends AbstractFrameController{
             try {
                 Class classe = Class.forName(menu.getPath());
                 Object obj = ApplicationContextHolder.getBean(classe);
-                JPanel panel = (JPanel) obj;
+                AbstractPanelController controller = (AbstractPanelController) obj;
                 
                 JTabbedPane tabbedPane = dashboardPanel.getTabbedPaneRight();
                 int indexTab = getTabbedIndex(tabbedPane , menu.getName());
@@ -76,7 +74,7 @@ public class DashboardController extends AbstractFrameController{
                 if(indexTab > -1){
                     tabbedPane.setSelectedIndex(indexTab);
                 }else{
-                    tabbedPane.addTab(menu.getName(), panel);
+                    tabbedPane.addTab(menu.getName(), controller.prepareAndGetPanel());
                     tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
                 }
                    
@@ -99,7 +97,6 @@ public class DashboardController extends AbstractFrameController{
         return new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("Mouse Clicked !!!"+treeMenu.getRowForLocation(e.getX(),e.getY()));
                 if(treeMenu.getRowForLocation(e.getX(),e.getY()) == -1) {
                     treeMenu.clearSelection();
                 }

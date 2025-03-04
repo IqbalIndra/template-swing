@@ -5,10 +5,8 @@
  */
 package com.learn.shirologin.ui.user.view;
 
-import com.learn.shirologin.model.UserInfo;
-import com.learn.shirologin.service.UserInfoService;
+import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
 import com.learn.shirologin.ui.user.model.UserTableModel;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -17,8 +15,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,31 +25,27 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Getter
-public class UserPanel extends JPanel{
+@RequiredArgsConstructor
+public class UserTablePaginationPanel extends JPanel{
     private JButton btnLast;
     private JButton btnNext;
-    private JComboBox<String> cbxPagePerSize;
+    private JComboBox<Integer> cbxPagePerSize;
     private JButton btnPrevious;
     private JButton btnFirst;
     private JButton btnNew;
     private JTable tableUser;
-    
-    @Autowired private UserInfoService userInfoService;
-    @Autowired private UserTableModel userTableModel;
+    private final UserTableModel userTableModel;
+    private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     
     @PostConstruct
     private void preparePanel(){
         setPanel();
+        initComponent();
     }
 
     private void setPanel() {
-        MigLayout migLayout = new MigLayout("debug, fill");
+        MigLayout migLayout = new MigLayout("fill");
         setLayout(migLayout);
-        JPanel panelPagination = createPanelPagination();
-       
-        add(panelPagination, "dock north");
-        add(createTable(), "dock center");
-        
     }
 
     private JPanel createPanelPagination() {
@@ -65,25 +59,11 @@ public class UserPanel extends JPanel{
        
         return panel;
     }
-    
-    private JPanel createPanelTable(){
-        JPanel panel = new JPanel();
-        panel.setLayout(new MigLayout("fill"));
-        JScrollPane scrollPane = createTable();
-        panel.add(scrollPane,"dock center");
-        
-       return panel;
-    }
 
     private JScrollPane createTable() {
-        tableUser = new JTable();
+        tableUser = new JTable(userTableModel);
         tableUser.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableUser.setFillsViewportHeight(true);
-        
-        List<UserInfo> userInfos = userInfoService.getAllUserInfo();
-        
-        userTableModel.addDatas(userInfos);
-        tableUser.setModel(userTableModel);
         
         JScrollPane paneWithTable = new JScrollPane(tableUser);
         return paneWithTable;
@@ -92,9 +72,10 @@ public class UserPanel extends JPanel{
     private JPanel createPanelLeftPagination() {
         JPanel panel = new JPanel();
         btnLast = new JButton("Last");
-        btnNext = new JButton("Next");
-        cbxPagePerSize = new JComboBox<>();
-        btnPrevious = new JButton("Previous");
+        btnNext = new JButton(">");
+        cbxPagePerSize = new JComboBox(userPaginationComboBoxModel);
+        
+        btnPrevious = new JButton("<");
         btnFirst = new JButton("First");
         btnNew = new JButton("New");
         
@@ -105,6 +86,13 @@ public class UserPanel extends JPanel{
         panel.add(btnFirst);
         
         return panel;
+    }
+
+    private void initComponent() {
+        JPanel panelPagination = createPanelPagination();
+       
+        add(panelPagination, "dock north");
+        add(createTable(), "dock center");
     }
     
 }

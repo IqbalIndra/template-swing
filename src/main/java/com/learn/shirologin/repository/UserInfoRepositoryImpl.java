@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -110,6 +113,33 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
                                 .build()
                
         );
+    }
+
+    @Override
+    public Page<UserInfo> findByPagination(Pageable pageable) {
+        String rowCountSql = "SELECT count(1) AS row_count " +
+                "FROM user_info ";
+        int total =
+                jdbcTemplate.queryForObject(
+                        rowCountSql, (rs, rowNum) -> rs.getInt(1)
+                );
+
+        String querySql = "SELECT * " +
+                "FROM user_info " +
+                "LIMIT " + pageable.getPageSize() + " " +
+                "OFFSET " + pageable.getOffset();
+        List<UserInfo> demos = jdbcTemplate.query(
+                querySql, 
+                (rs, rowNum) -> UserInfo.of()
+                                .username(rs.getString("username"))
+                                .email(rs.getString("email"))
+                                .password(rs.getString("password"))
+                                .id(rs.getLong("id"))
+                                .role(Role.valueOfRole(rs.getString("role")))
+                                .build()
+        );
+
+        return new PageImpl<>(demos, pageable, total);
     }
     
 }

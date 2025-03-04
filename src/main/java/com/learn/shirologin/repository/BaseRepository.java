@@ -7,6 +7,8 @@ package com.learn.shirologin.repository;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  *
@@ -16,4 +18,5 @@ public interface BaseRepository<U,T> {
     Optional<T> findById(U id);
     T save(T t);
     List<T> findAll();
+    Page<T> findByPagination(Pageable pageable);
 }
