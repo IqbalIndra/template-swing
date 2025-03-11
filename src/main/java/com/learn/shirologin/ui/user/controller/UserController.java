@@ -16,10 +16,16 @@ import com.learn.shirologin.ui.user.view.UserTablePaginationPanel;
 import com.learn.shirologin.ui.user.view.modal.UserInfoFormBtnPanel;
 import com.learn.shirologin.ui.user.view.modal.UserInfoFormDialog;
 import com.learn.shirologin.ui.user.view.modal.UserInfoFormPanel;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Arrays;
 import javax.annotation.PostConstruct;
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,7 +53,7 @@ public class UserController extends AbstractPanelController{
     @PostConstruct
     private void prepareListeners(){
         UserInfoFormBtnPanel userInfoFormBtnPanel = userInfoFormDialog.getUserInfoFormBtnPanel();
-        
+
         registerAction(userTablePaginationPanel.getBtnFirst(), (e) -> showFirstData());
         registerAction(userTablePaginationPanel.getBtnLast(), (e) -> showLastData());
         registerAction(userTablePaginationPanel.getBtnNext(), (e) -> showNextData());
@@ -56,6 +62,7 @@ public class UserController extends AbstractPanelController{
         registerAction(userTablePaginationPanel.getCbxPagePerSize(), (e) -> showDataPerPageSize(e));
         registerAction(userInfoFormBtnPanel.getSaveBtn(), (e) -> saveUserInfo(e));
         registerAction(userInfoFormBtnPanel.getCancelBtn(), (e) -> cancelSaveUserInfo());
+        registerMouseListener(userTablePaginationPanel.getTableUser(), onClickedTableUser());
     }
     
    
@@ -85,6 +92,9 @@ public class UserController extends AbstractPanelController{
     }
 
     private void showNewData() {
+        userInfoFormDialog.getUserInfoFormPanel().clearForm();
+        userInfoFormDialog.getUserInfoFormPanel().enabledComponent(true);
+        userInfoFormDialog.getUserInfoFormBtnPanel().getSaveBtn().setText("Save");
         userInfoFormDialog.setVisible(true);
     }
 
@@ -130,17 +140,58 @@ public class UserController extends AbstractPanelController{
     }
 
     private void saveUserInfo(ActionEvent e) {
+        JButton button = (JButton) e.getSource();
+
+        if(!button.getText().equalsIgnoreCase("save")){
+            userInfoFormDialog.getUserInfoFormPanel().enabledComponent(true);
+            button.setText("Save");
+            return;
+        }
+
         UserInfoFormPanel userInfoFormPanel = userInfoFormDialog.getUserInfoFormPanel();
         UserInfo userInfo = userInfoFormPanel.getEntityFromForm();
-        
-        userInfoService.save(userInfo);
-        userTableModel.addData(userInfo);
+
+        if(!ObjectUtils.isEmpty(userInfo.getId())){
+            userInfoService.update(userInfo);
+            userTableModel.updateData(userTablePaginationPanel.getTableUser().getSelectedRow(), userInfo);
+        }else{
+            userInfoService.save(userInfo);
+            userTableModel.addData(userInfo);
+        }
+
         cancelSaveUserInfo();
     }
 
     private void cancelSaveUserInfo() {
         userInfoFormDialog.getUserInfoFormPanel().clearForm();
+        userInfoFormDialog.getUserInfoFormBtnPanel().getSaveBtn().setText("Save");
         userInfoFormDialog.dispose();
     }
-    
+
+    private void showViewData(UserInfo info){
+        JButton jButton = userInfoFormDialog.getUserInfoFormBtnPanel().getSaveBtn();
+        jButton.setText("Edit");
+
+        userInfoFormDialog.getUserInfoFormPanel().setEntityToForm(info);
+        userInfoFormDialog.setVisible(true);
+    }
+
+    private MouseListener onClickedTableUser() {
+        return new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                JTable table =(JTable) e.getSource();
+                Point point = e.getPoint();
+                int row = table.rowAtPoint(point);
+
+                if (e.getClickCount() == 2 && table.getSelectedRow() != -1 && row != -1) {
+                    UserInfo info = userTableModel.getDataByRow(row);
+                    showViewData(info);
+                }
+            }
+        };
+    }
+
+
+
 }

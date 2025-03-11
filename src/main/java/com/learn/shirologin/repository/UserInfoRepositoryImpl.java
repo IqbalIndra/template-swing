@@ -144,7 +144,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
 
     @Override
     public UserInfo update(UserInfo t) {
-        String sql = "UPDATE user_info SET username=?,email=?,email=?,role=? WHERE id=? ";
+        String sql = "UPDATE user_info SET username=?,email=?,password=?,role=? WHERE id=? ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -155,12 +155,12 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
               ps.setString(3, t.getPassword());
               ps.setString(4, t.getRole().name());
               ps.setLong(5, t.getId());
-              
-              
+
+
               return ps;
             });
-        
+
         return t;
     }
-    
+
 }

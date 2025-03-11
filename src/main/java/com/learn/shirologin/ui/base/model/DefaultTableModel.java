@@ -47,6 +47,11 @@ public abstract class DefaultTableModel<T> extends AbstractTableModel{
         return datas.get(row);
     }
     
+    public void updateData(int row, T data){
+        datas.set(row, data);
+        fireTableDataChanged();
+    }
+    
     public void removeData(int row){
         datas.remove(row);
         fireTableDataChanged();

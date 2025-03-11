@@ -7,9 +7,12 @@ package com.learn.shirologin.ui.base.controller;
 
 import java.awt.Component;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTree;
 
 /**
  *
@@ -23,6 +26,14 @@ public abstract class AbstractPanelController {
             ((JButton) (component)).addActionListener(actionListener);
         }else if(component instanceof JComboBox) {
             ((JComboBox) (component)).addActionListener(actionListener);
+        }
+    }
+    
+    protected void registerMouseListener(Component component, MouseListener listener){
+        if(component instanceof JTree) {
+            ((JTree) (component)).addMouseListener(listener);
+        }else if(component instanceof JTable){
+            ((JTable) (component)).addMouseListener(listener);
         }
     }
     

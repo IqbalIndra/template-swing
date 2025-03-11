@@ -20,16 +20,14 @@ import org.springframework.stereotype.Component;
 public class UserTableModel extends DefaultTableModel<UserInfo>{
     
     private static final int USERNAME_INDEX = 0;
-    private static final int PASSWORD_INDEX= 2;
     private static final int EMAIL_INDEX = 1;
-    private static final int ROLE_INDEX = 3;
+    private static final int ROLE_INDEX = 2;
 
     @Override
     public String[] getColumnLabels() {
         return new String[] {
             "Username",
             "Email",
-            "Password",
             "Role"
         };
     }
@@ -40,8 +38,6 @@ public class UserTableModel extends DefaultTableModel<UserInfo>{
         switch(columnIndex) {
             case USERNAME_INDEX :
                return userInfo.getUsername();
-            case PASSWORD_INDEX :
-                return userInfo.getPassword();
             case EMAIL_INDEX : 
                 return userInfo.getEmail();
             case ROLE_INDEX : 

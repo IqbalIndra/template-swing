@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.WindowListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionListener;
 
@@ -38,6 +39,8 @@ public abstract class AbstractFrameController {
     protected void registerMouseListener(Component component, MouseListener listener){
         if(component instanceof JTree) {
             ((JTree) (component)).addMouseListener(listener);
+        }else if(component instanceof JTable){
+            ((JTable) (component)).addMouseListener(listener);
         }
     }
     

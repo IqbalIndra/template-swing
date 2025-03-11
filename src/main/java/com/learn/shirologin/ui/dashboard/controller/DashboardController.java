@@ -11,6 +11,7 @@ import com.learn.shirologin.ui.base.controller.AbstractFrameController;
 import com.learn.shirologin.ui.dashboard.view.DashboardPanel;
 import com.learn.shirologin.ui.main.view.MainFrame;
 import com.learn.shirologin.util.ApplicationContextHolder;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.lang.reflect.Method;
@@ -74,7 +75,7 @@ public class DashboardController extends AbstractFrameController{
                     Object obj = ApplicationContextHolder.getBean(classe);
                     Method method = classe.getDeclaredMethod("prepareAndGetPanel", (Class[]) null);
                     JPanel panel = (JPanel) method.invoke(obj, (Object[]) null);
-                
+
                     tabbedPane.addTab(menu.getName(), panel);
                     tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
                 }
@@ -95,7 +96,7 @@ public class DashboardController extends AbstractFrameController{
     }
 
     private MouseListener releaseTreeSelected(final JTree treeMenu) {
-        return new MouseListener() {
+        return new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(treeMenu.getRowForLocation(e.getX(),e.getY()) == -1) {
@@ -103,25 +104,6 @@ public class DashboardController extends AbstractFrameController{
                 }
             }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                
-            }
         };
     }
 }

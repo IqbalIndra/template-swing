@@ -15,6 +15,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.UIManager;
 import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.util.Strings;
@@ -36,7 +37,8 @@ public class UserInfoFormPanel extends JPanel{
     private JTextField emailTxt;
     private JPasswordField passwordTxt;
     private JComboBox userRoleComboBox;
-    
+    private UserInfo entity;
+
     
     @PostConstruct
     private void preparePanel(){
@@ -70,18 +72,46 @@ public class UserInfoFormPanel extends JPanel{
     }
     
     public UserInfo getEntityFromForm(){
-        return UserInfo.of()
-                .username(usernameTxt.getText())
-                .email(emailTxt.getText())
-                .password(String.valueOf(passwordTxt.getPassword()))
-                .role(userRoleComboBoxModel.getSelectedItem())
-                .build();
+        if(entity == null){
+            entity = UserInfo.of().build();
+        }
+
+        entity.setUsername(usernameTxt.getText());
+        entity.setEmail(emailTxt.getText());
+        entity.setPassword(String.valueOf(passwordTxt.getPassword()));
+        entity.setRole(userRoleComboBoxModel.getSelectedItem());
+
+        return entity;
     }
-    
+
     public void clearForm(){
+        this.entity = null;
+
         usernameTxt.setText(Strings.EMPTY);
         emailTxt.setText(Strings.EMPTY);
         passwordTxt.setText(Strings.EMPTY);
-        userRoleComboBox.setSelectedIndex(-1);
+        userRoleComboBox.setSelectedIndex(0);
+    }
+
+    public void enabledComponent(boolean enabled){
+        usernameTxt.setEditable(enabled);
+        usernameTxt.setEnabled(enabled);
+        emailTxt.setEditable(enabled);
+        emailTxt.setEnabled(enabled);
+        passwordTxt.setEditable(enabled);
+        passwordTxt.setEnabled(enabled);
+        userRoleComboBox.setEnabled(enabled);
+    }
+
+    public void setEntityToForm(UserInfo info){
+        this.entity = info;
+
+        usernameTxt.setText(entity.getUsername());
+        emailTxt.setText(entity.getEmail());
+        passwordTxt.setText(entity.getPassword());
+        userRoleComboBoxModel.setSelectedItem(entity.getRole());
+
+
+        enabledComponent(false);
     }
 }
