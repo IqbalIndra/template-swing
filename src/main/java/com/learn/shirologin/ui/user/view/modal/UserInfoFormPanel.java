@@ -5,6 +5,7 @@
  */
 package com.learn.shirologin.ui.user.view.modal;
 
+import com.learn.shirologin.model.UserInfo;
 import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.util.Borders;
 import javax.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,12 +31,10 @@ public class UserInfoFormPanel extends JPanel{
     private JLabel usernameLbl;
     private JLabel emailLbl;
     private JLabel passwordLbl;
-    private JLabel confirmPasswordLbl;
     private JLabel roleLbl;
     private JTextField usernameTxt;
     private JTextField emailTxt;
     private JPasswordField passwordTxt;
-    private JPasswordField confirmPasswordTxt;
     private JComboBox userRoleComboBox;
     
     
@@ -48,12 +48,10 @@ public class UserInfoFormPanel extends JPanel{
         usernameLbl = new JLabel("Username:");
         emailLbl = new JLabel("Email:");
         passwordLbl = new JLabel("Password:");
-        confirmPasswordLbl = new JLabel("Confirm Password:");
         roleLbl = new JLabel("Role:");
         usernameTxt = new JTextField(20);
         emailTxt = new JTextField(50);
         passwordTxt = new JPasswordField(20);
-        confirmPasswordTxt = new JPasswordField(20);
         userRoleComboBox = new JComboBox<>(userRoleComboBoxModel);    
         
         add(usernameLbl,"left");
@@ -62,8 +60,6 @@ public class UserInfoFormPanel extends JPanel{
         add(emailTxt,"pushx,growx");
         add(passwordLbl,"left");
         add(passwordTxt,"pushx,growx");
-        add(confirmPasswordLbl,"left");
-        add(confirmPasswordTxt,"pushx,growx");
         add(roleLbl,"left");
         add(userRoleComboBox,"pushx,growx");
     }
@@ -73,4 +69,19 @@ public class UserInfoFormPanel extends JPanel{
         setLayout(new MigLayout("wrap 2","[]10[]"));
     }
     
+    public UserInfo getEntityFromForm(){
+        return UserInfo.of()
+                .username(usernameTxt.getText())
+                .email(emailTxt.getText())
+                .password(String.valueOf(passwordTxt.getPassword()))
+                .role(userRoleComboBoxModel.getSelectedItem())
+                .build();
+    }
+    
+    public void clearForm(){
+        usernameTxt.setText(Strings.EMPTY);
+        emailTxt.setText(Strings.EMPTY);
+        passwordTxt.setText(Strings.EMPTY);
+        userRoleComboBox.setSelectedIndex(-1);
+    }
 }

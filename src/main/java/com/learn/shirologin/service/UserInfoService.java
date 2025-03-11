@@ -18,4 +18,6 @@ public interface UserInfoService {
    void login(String username, String password);
     List<UserInfo> getAllUserInfo();
     Page<UserInfo> getAllUserInfo(Pageable pageable);
+    UserInfo save(UserInfo info);
+    UserInfo update(UserInfo info);
 }

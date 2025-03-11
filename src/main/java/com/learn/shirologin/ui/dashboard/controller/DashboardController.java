@@ -8,12 +8,12 @@ package com.learn.shirologin.ui.dashboard.controller;
 import com.learn.shirologin.domain.menu.model.TreeMenu;
 import com.learn.shirologin.domain.menu.service.TreeMenuService;
 import com.learn.shirologin.ui.base.controller.AbstractFrameController;
-import com.learn.shirologin.ui.base.controller.AbstractPanelController;
 import com.learn.shirologin.ui.dashboard.view.DashboardPanel;
 import com.learn.shirologin.ui.main.view.MainFrame;
 import com.learn.shirologin.util.ApplicationContextHolder;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.Method;
 import java.util.Optional;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
@@ -64,21 +64,22 @@ public class DashboardController extends AbstractFrameController{
             TreeMenu menu = (TreeMenu) nodeInfo;
             
             try {
-                Class classe = Class.forName(menu.getPath());
-                Object obj = ApplicationContextHolder.getBean(classe);
-                AbstractPanelController controller = (AbstractPanelController) obj;
-                
                 JTabbedPane tabbedPane = dashboardPanel.getTabbedPaneRight();
                 int indexTab = getTabbedIndex(tabbedPane , menu.getName());
                 
                 if(indexTab > -1){
                     tabbedPane.setSelectedIndex(indexTab);
                 }else{
-                    tabbedPane.addTab(menu.getName(), controller.prepareAndGetPanel());
+                    Class classe = Class.forName(menu.getPath());
+                    Object obj = ApplicationContextHolder.getBean(classe);
+                    Method method = classe.getDeclaredMethod("prepareAndGetPanel", (Class[]) null);
+                    JPanel panel = (JPanel) method.invoke(obj, (Object[]) null);
+                
+                    tabbedPane.addTab(menu.getName(), panel);
                     tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
                 }
                    
-            } catch (ClassNotFoundException ex) {
+            } catch (Exception ex) {
                 log.error("Error Get Class Not Found =>{}",ex.getMessage());
             }
            

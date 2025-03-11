@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 public interface BaseRepository<U,T> {
     Optional<T> findById(U id);
     T save(T t);
+    T update(T t);
     List<T> findAll();
     Page<T> findByPagination(Pageable pageable);
 }

@@ -141,5 +141,26 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
 
         return new PageImpl<>(demos, pageable, total);
     }
+
+    @Override
+    public UserInfo update(UserInfo t) {
+        String sql = "UPDATE user_info SET username=?,email=?,email=?,role=? WHERE id=? ";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection
+              .prepareStatement(sql);
+              ps.setString(1, t.getUsername());
+              ps.setString(2, t.getEmail());
+              ps.setString(3, t.getPassword());
+              ps.setString(4, t.getRole().name());
+              ps.setLong(5, t.getId());
+              
+              
+              return ps;
+            });
+        
+        return t;
+    }
     
 }

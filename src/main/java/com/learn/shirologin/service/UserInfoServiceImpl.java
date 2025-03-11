@@ -47,5 +47,15 @@ public class UserInfoServiceImpl implements UserInfoService{
     public Page<UserInfo> getAllUserInfo(Pageable pageable) {
         return userInfoRepository.findByPagination(pageable);
     }
+
+    @Override
+    public UserInfo save(UserInfo info) {
+        return userInfoRepository.save(info);
+    }
+
+    @Override
+    public UserInfo update(UserInfo info) {
+        return userInfoRepository.update(info);
+    }
     
 }
