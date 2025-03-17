@@ -8,13 +8,17 @@ package com.learn.shirologin.model;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  *
  * @author KBDSI-IQBAL
  */
 @Data
 @Builder(builderMethodName = "of")
-public class UserInfo {
+public class UserInfo implements Serializable {
+    private static final long serialVersionUID = 2804537642267854538L;
+
     private Long id;
     private String username;
     private String email;

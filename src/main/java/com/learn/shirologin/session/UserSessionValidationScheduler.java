@@ -1,0 +1,104 @@
+package com.learn.shirologin.session;
+
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.ReflectionUtils;
+
+import javax.swing.*;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
+public class UserSessionValidationScheduler implements SessionValidationScheduler,Runnable {
+
+    private JdbcTemplate jdbcTemplate;
+    private DefaultSessionManager defaultSessionManager;
+    private ScheduledExecutorService scheduledExecutorService;
+
+    @Setter
+    private long interval = DefaultSessionManager.DEFAULT_SESSION_VALIDATION_INTERVAL;
+
+    @Setter
+    private boolean enabled = false;
+
+    public UserSessionValidationScheduler(){
+
+    }
+
+    @Autowired
+    public void setDefaultSessionManager(DefaultSessionManager defaultSessionManager) {
+        this.defaultSessionManager = defaultSessionManager;
+    }
+
+    @Autowired
+    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @Override
+    public void run() {
+        log.info("Executing session validation...");
+        long startTime = System.currentTimeMillis();
+
+        //分页获取会话并验证
+        String sql = "select session from sessions limit ?,?";
+        int start = 0; //起始记录
+        int size = 20; //每页大小
+        List<String> sessionList = jdbcTemplate.queryForList(sql, String.class, start, size);
+        log.info("Sessions found: {}", sessionList);
+        while(sessionList.size() > 0) {
+            for(String sessionStr : sessionList) {
+                try {
+                    Session session = SessionSerializable.deserialize(sessionStr);
+                    Method validateMethod = ReflectionUtils.findMethod(AbstractValidatingSessionManager.class, "validate", Session.class, SessionKey.class);
+                    validateMethod.setAccessible(true);
+                    ReflectionUtils.invokeMethod(validateMethod, defaultSessionManager, session, new DefaultSessionKey(session.getId()));
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            start = start + size;
+            sessionList = jdbcTemplate.queryForList(sql, String.class, start, size);
+        }
+
+        long stopTime = System.currentTimeMillis();
+
+        log.info("Session validation completed successfully in " + (stopTime - startTime) + " milliseconds.");
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    @Override
+    public void enableSessionValidation() {
+        if (this.interval > 0L) {
+            this.scheduledExecutorService = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r);
+                    thread.setDaemon(true);
+                    return thread;
+                }
+            });
+            this.scheduledExecutorService.scheduleAtFixedRate(this, interval, interval, TimeUnit.MILLISECONDS);
+            this.enabled = true;
+        }
+    }
+
+    @Override
+    public void disableSessionValidation() {
+        this.scheduledExecutorService.shutdownNow();
+        this.enabled = false;
+    }
+}

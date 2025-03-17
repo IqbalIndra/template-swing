@@ -17,3 +17,10 @@ create table user_info (
     password varchar(100) not null,
     role varchar(100) not null
 );
+
+drop table if exists sessions;
+
+create table sessions (
+      id varchar(200) primary key,
+      session varchar(2000) not null
+);
