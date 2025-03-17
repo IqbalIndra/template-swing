@@ -20,4 +20,5 @@ public interface UserInfoService {
     Page<UserInfo> getAllUserInfo(Pageable pageable);
     UserInfo save(UserInfo info);
     UserInfo update(UserInfo info);
+    void delete(UserInfo info);
 }

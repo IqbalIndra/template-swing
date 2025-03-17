@@ -34,7 +34,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
     public Optional<UserInfo> findByUsername(String username) {
         try {
             return jdbcTemplate.queryForObject(
-                "select * from user_info where username = ?",
+                "select * from user_info where username = ? AND is_deleted = false",
                 (rs, rowNum) ->
                         Optional.of(
                                 UserInfo.of()
@@ -43,6 +43,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
                                 .password(rs.getString("password"))
                                 .id(rs.getLong("id"))
                                 .role(Role.valueOfRole(rs.getString("role")))
+                                .deleted(rs.getBoolean("is_deleted"))
                                 .build()
                         ),
                 new Object[]{username}
@@ -67,6 +68,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
                                 .password(rs.getString("password"))
                                 .id(rs.getLong("id"))
                                 .role(Role.valueOfRole(rs.getString("role")))
+                                .deleted(rs.getBoolean("is_deleted"))
                                 .build()
                         ),
                 new Object[]{id}
@@ -79,7 +81,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
 
     @Override
     public UserInfo save(UserInfo t) {
-        String sql = "INSERT INTO user_info (username,email,password,role) VALUES (?,?,?,?) ";
+        String sql = "INSERT INTO user_info (username,email,password,role,is_deleted) VALUES (?,?,?,?,false) ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -102,7 +104,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
     @Override
     public List<UserInfo> findAll() {
         return jdbcTemplate.query(
-                "select * from user_info",
+                "select * from user_info WHERE is_deleted=false",
                 (rs, rowNum) ->
                         UserInfo.of()
                                 .username(rs.getString("username"))
@@ -110,6 +112,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
                                 .password(rs.getString("password"))
                                 .id(rs.getLong("id"))
                                 .role(Role.valueOfRole(rs.getString("role")))
+                                .deleted(rs.getBoolean("is_deleted"))
                                 .build()
                
         );
@@ -118,14 +121,14 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
     @Override
     public Page<UserInfo> findByPagination(Pageable pageable) {
         String rowCountSql = "SELECT count(1) AS row_count " +
-                "FROM user_info ";
+                "FROM user_info WHERE is_deleted = false ";
         int total =
                 jdbcTemplate.queryForObject(
                         rowCountSql, (rs, rowNum) -> rs.getInt(1)
                 );
 
         String querySql = "SELECT * " +
-                "FROM user_info " +
+                "FROM user_info WHERE is_deleted=false " +
                 "LIMIT " + pageable.getPageSize() + " " +
                 "OFFSET " + pageable.getOffset();
         List<UserInfo> demos = jdbcTemplate.query(
@@ -136,6 +139,7 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
                                 .password(rs.getString("password"))
                                 .id(rs.getLong("id"))
                                 .role(Role.valueOfRole(rs.getString("role")))
+                                .deleted(rs.getBoolean("is_deleted"))
                                 .build()
         );
 
@@ -161,6 +165,21 @@ public class UserInfoRepositoryImpl implements UserInfoRepository{
             });
 
         return t;
+    }
+
+    @Override
+    public void delete(Long id) {
+        String sql = "UPDATE user_info SET is_deleted=? WHERE id=? ";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection
+                    .prepareStatement(sql);
+            ps.setBoolean(1, true);
+            ps.setLong(2, id);
+
+            return ps;
+        });
     }
 
 }

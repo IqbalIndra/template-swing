@@ -8,6 +8,6 @@
  * Created: Feb 4, 2025
  */
 
-insert into user_info (username,email,password,role) VALUES('tester','tester@gmail.com','12345','admin');
-insert into user_info (username,email,password,role) VALUES('iqbal','iqbalolala@gmail.com','12345','user');
-insert into user_info (username,email,password,role) VALUES('balbal','balbalcikibal@gmail.com','12345','user');
+insert into user_info (username,email,password,role,is_deleted) VALUES('tester','tester@gmail.com','12345','admin',false);
+insert into user_info (username,email,password,role,is_deleted) VALUES('iqbal','iqbalolala@gmail.com','12345','user',false);
+insert into user_info (username,email,password,role,is_deleted) VALUES('balbal','balbalcikibal@gmail.com','12345','user',false);

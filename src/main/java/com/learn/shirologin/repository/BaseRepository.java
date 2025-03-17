@@ -18,6 +18,7 @@ public interface BaseRepository<U,T> {
     Optional<T> findById(U id);
     T save(T t);
     T update(T t);
+    void delete(U id);
     List<T> findAll();
     Page<T> findByPagination(Pageable pageable);
 }

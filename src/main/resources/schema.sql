@@ -15,7 +15,8 @@ create table user_info (
     username varchar(100) not null unique,
     email varchar(100) not null unique,
     password varchar(100) not null,
-    role varchar(100) not null
+    role varchar(100) not null,
+    is_deleted boolean not null
 );
 
 drop table if exists sessions;

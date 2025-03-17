@@ -10,6 +10,8 @@ import java.util.Arrays;
 
 import com.learn.shirologin.session.UserSessionRepository;
 import com.learn.shirologin.session.UserSessionValidationScheduler;
+import com.learn.shirologin.ui.login.controller.LoginController;
+import com.learn.shirologin.ui.main.view.MainFrame;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.session.SessionListener;
@@ -42,10 +44,14 @@ public class ShiroLoginConfiguration {
 
         @Bean
         public UserSessionValidationScheduler userSessionValidationScheduler(@Autowired JdbcTemplate jdbcTemplate,
-                                                                         @Autowired DefaultSessionManager sessionManager){
+                                                                             @Autowired DefaultSessionManager sessionManager,
+                                                                             @Autowired LoginController loginController,
+                                                                             @Autowired MainFrame mainFrame){
             UserSessionValidationScheduler userSessionValidationScheduler = new UserSessionValidationScheduler();
             userSessionValidationScheduler.setJdbcTemplate(jdbcTemplate);
             userSessionValidationScheduler.setDefaultSessionManager(sessionManager);
+            userSessionValidationScheduler.setLoginController(loginController);
+            userSessionValidationScheduler.setFrame(mainFrame);
             userSessionValidationScheduler.setInterval(10000);
             return userSessionValidationScheduler;
         }

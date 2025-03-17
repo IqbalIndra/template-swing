@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,10 +32,17 @@ public class UserInfoServiceImpl implements UserInfoService{
 
     @Override
     public void login(String username, String password) throws AuthenticationException{
-         UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+            UsernamePasswordToken token = new UsernamePasswordToken(username, password);
             // get the Subject instance for the current thread
             Subject currentUser = SecurityUtils.getSubject();
-            // attempt to authenticate the user
+            if (currentUser == null)
+                return;
+            currentUser.logout();
+
+            Session session = currentUser.getSession(false);
+            if (session != null)
+                session.stop();
+        // attempt to authenticate the user
             currentUser.login(token);
     }
 
@@ -57,5 +65,13 @@ public class UserInfoServiceImpl implements UserInfoService{
     public UserInfo update(UserInfo info) {
         return userInfoRepository.update(info);
     }
-    
+
+    @Override
+    public void delete(UserInfo info) {
+        userInfoRepository.findById(
+                info.getId()
+        ).orElseThrow(() -> new RuntimeException("User not found"));
+        userInfoRepository.delete(info.getId());
+    }
+
 }

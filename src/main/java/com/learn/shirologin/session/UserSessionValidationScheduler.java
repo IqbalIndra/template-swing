@@ -1,7 +1,7 @@
 package com.learn.shirologin.session;
 
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import com.learn.shirologin.ui.login.controller.LoginController;
+import com.learn.shirologin.ui.main.view.MainFrame;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.session.Session;
@@ -23,6 +23,8 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
 
     private JdbcTemplate jdbcTemplate;
     private DefaultSessionManager defaultSessionManager;
+    private LoginController loginController;
+    private JFrame frame;
     private ScheduledExecutorService scheduledExecutorService;
 
     @Setter
@@ -45,17 +47,26 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Autowired
+    public void setLoginController(LoginController loginController){
+        this.loginController = loginController;
+    }
+
+    @Autowired
+    public void setFrame(JFrame frame) {
+        this.frame = frame;
+    }
+
     @Override
     public void run() {
         log.info("Executing session validation...");
         long startTime = System.currentTimeMillis();
 
-        //分页获取会话并验证
+
         String sql = "select session from sessions limit ?,?";
-        int start = 0; //起始记录
-        int size = 20; //每页大小
+        int start = 0;
+        int size = 20;
         List<String> sessionList = jdbcTemplate.queryForList(sql, String.class, start, size);
-        log.info("Sessions found: {}", sessionList);
         while(sessionList.size() > 0) {
             for(String sessionStr : sessionList) {
                 try {
@@ -64,7 +75,11 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
                     validateMethod.setAccessible(true);
                     ReflectionUtils.invokeMethod(validateMethod, defaultSessionManager, session, new DefaultSessionKey(session.getId()));
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    MainFrame mainFrame = (MainFrame) frame;
+                    int input = JOptionPane.showConfirmDialog(mainFrame, "Login Expired. Please login !", "Session",JOptionPane.OK_CANCEL_OPTION);
+                    if(input == JOptionPane.OK_OPTION) {
+                        loginController.prepareAndOpenFrame();
+                    }
                 }
             }
             start = start + size;
