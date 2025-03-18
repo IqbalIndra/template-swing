@@ -21,6 +21,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+
+import com.learn.shirologin.util.ConstantParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -42,7 +44,7 @@ public class DashboardController extends AbstractFrameController{
         registerTreeAction(dashboardPanel.getTreeMenu(), (e) -> showMenu());
         registerMouseListener(dashboardPanel.getTreeMenu(), releaseTreeSelected(dashboardPanel.getTreeMenu()));
         loadTreeMenu();
-        mainFrame.showView("Dashboard", dashboardPanel, null);
+        mainFrame.showViewCardPanel(ConstantParams.DASHBOARD_PANEL);
     }
 
     private void loadTreeMenu() {

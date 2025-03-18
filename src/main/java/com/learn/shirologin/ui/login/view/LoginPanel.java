@@ -32,8 +32,6 @@ public class LoginPanel extends JPanel{
     private JPasswordField txtPassword;
     private JButton buttonLogin;
     private JButton buttonCancel;
-    private static final int WIDTH = 300;
-    private static final int HEIGHT = 400;
     
     
     @PostConstruct
@@ -43,7 +41,6 @@ public class LoginPanel extends JPanel{
     }
 
     private void setPanelUp() {
-        setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setLayout(new MigLayout("align 50% 50%"));
     }
 

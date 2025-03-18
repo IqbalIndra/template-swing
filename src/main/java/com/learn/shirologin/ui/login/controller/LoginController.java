@@ -14,6 +14,8 @@ import com.learn.shirologin.ui.login.view.LoginPanel;
 import com.learn.shirologin.ui.main.view.MainFrame;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+
+import com.learn.shirologin.util.ConstantParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -39,7 +41,7 @@ public class LoginController extends AbstractFrameController{
         registerAction(loginPanel.getButtonLogin(), (e) -> submitLogin());
         registerAction(loginPanel.getButtonCancel(), (e) -> cancelLogin());
         
-        mainFrame.showView("Login",loginPanel, new Dimension(300, 200));
+        mainFrame.showViewCardPanel(ConstantParams.LOGIN_PANEL);
     }
 
     private void submitLogin() {
@@ -53,7 +55,7 @@ public class LoginController extends AbstractFrameController{
             log.error(e.getMessage());
             throw new AuthenticationException(e.getMessage());
         }
-        
+        loginPanel.clearForm();
         dashboardController.prepareAndOpenFrame();
         
     }

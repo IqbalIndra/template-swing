@@ -24,7 +24,6 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
     private JdbcTemplate jdbcTemplate;
     private DefaultSessionManager defaultSessionManager;
     private LoginController loginController;
-    private JFrame frame;
     private ScheduledExecutorService scheduledExecutorService;
 
     @Setter
@@ -52,14 +51,11 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
         this.loginController = loginController;
     }
 
-    @Autowired
-    public void setFrame(JFrame frame) {
-        this.frame = frame;
-    }
-
     @Override
     public void run() {
-        log.info("Executing session validation...");
+        if(log.isDebugEnabled()){
+            log.debug("Executing session validation...");
+        }
         long startTime = System.currentTimeMillis();
 
 
@@ -75,11 +71,8 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
                     validateMethod.setAccessible(true);
                     ReflectionUtils.invokeMethod(validateMethod, defaultSessionManager, session, new DefaultSessionKey(session.getId()));
                 } catch (Exception e) {
-                    MainFrame mainFrame = (MainFrame) frame;
-                    int input = JOptionPane.showConfirmDialog(mainFrame, "Login Expired. Please login !", "Session",JOptionPane.OK_CANCEL_OPTION);
-                    if(input == JOptionPane.OK_OPTION) {
-                        loginController.prepareAndOpenFrame();
-                    }
+                    JOptionPane.showMessageDialog(null, "Login Expired. Please login !", "Session",JOptionPane.ERROR_MESSAGE);
+                    loginController.prepareAndOpenFrame();
                 }
             }
             start = start + size;
@@ -88,7 +81,9 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
 
         long stopTime = System.currentTimeMillis();
 
-        log.info("Session validation completed successfully in " + (stopTime - startTime) + " milliseconds.");
+        if(log.isDebugEnabled()){
+            log.debug("Session validation completed successfully in " + (stopTime - startTime) + " milliseconds.");
+        }
     }
 
     @Override

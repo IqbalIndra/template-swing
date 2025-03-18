@@ -30,8 +30,6 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class MainController extends AbstractFrameController{
     private final MainFrame mainFrame;
-    private final LoginPanel loginPanel;
-    private final DashboardPanel dashboardPanel;
     private final LoginController loginController;
     private final org.apache.shiro.mgt.SecurityManager securityManager;
     
@@ -54,27 +52,23 @@ public class MainController extends AbstractFrameController{
        return new WindowAdapter() {
            @Override
            public void windowClosing(WindowEvent e) {
-                if(mainFrame.isUnsaved()){
-                    Subject subject = SecurityUtils.getSubject();
-                    
-                    int answer = JOptionPane.showConfirmDialog(
-                            null,"Data was changed.\nAre sure to close?","Confirmation",
-                            JOptionPane.YES_NO_OPTION);
+               Subject subject = SecurityUtils.getSubject();
 
-                    switch (answer) {
-                            case JOptionPane.YES_OPTION:
-                                if(subject.isAuthenticated())
-                                    subject.logout();
+               int answer = JOptionPane.showConfirmDialog(
+                       mainFrame,"Are sure to close?","Confirmation",
+                       JOptionPane.YES_NO_OPTION);
 
-                                System.exit(0);
-                                break;
+               switch (answer) {
+                   case JOptionPane.YES_OPTION:
+                       if(subject.isAuthenticated())
+                           subject.logout();
 
-                            case JOptionPane.NO_OPTION:
-                                break;       
-                    }
-                }else{
-                    System.exit(0);
-                }
+                       System.exit(0);
+                       break;
+
+                   case JOptionPane.NO_OPTION:
+                       break;
+               }
            }
             
        };

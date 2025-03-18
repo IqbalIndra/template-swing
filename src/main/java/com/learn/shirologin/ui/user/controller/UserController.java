@@ -72,9 +72,14 @@ public class UserController extends AbstractPanelController{
                     "Please selected data !","Warning",JOptionPane.WARNING_MESSAGE);
             return;
         }
-        UserInfo dataByRow = userTableModel.getDataByRow(index);
-        userInfoService.delete(dataByRow);
-        userTableModel.removeData(index);
+
+        int choose = JOptionPane.showConfirmDialog(userTablePaginationPanel,"Are you sure want to delete this data?","Warning", JOptionPane.OK_CANCEL_OPTION);
+        if(choose == JOptionPane.OK_OPTION){
+            UserInfo dataByRow = userTableModel.getDataByRow(index);
+            userInfoService.delete(dataByRow);
+            userTableModel.removeData(index);
+        }
+
     }
 
 
@@ -107,6 +112,7 @@ public class UserController extends AbstractPanelController{
         userInfoFormDialog.getUserInfoFormPanel().enabledComponent(true);
         userInfoFormDialog.getUserInfoFormBtnPanel().getSaveBtn().setText("Save");
         userInfoFormDialog.setVisible(true);
+        userInfoFormDialog.setLocationRelativeTo(userTablePaginationPanel);
     }
 
     private void loadEntities(Pageable pageable) {
@@ -159,18 +165,22 @@ public class UserController extends AbstractPanelController{
             return;
         }
 
-        UserInfoFormPanel userInfoFormPanel = userInfoFormDialog.getUserInfoFormPanel();
-        UserInfo userInfo = userInfoFormPanel.getEntityFromForm();
+        int confirm = JOptionPane.showConfirmDialog(userInfoFormDialog,"Are you want to save this data ?","Confirm",JOptionPane.OK_CANCEL_OPTION);
+        if(confirm == JOptionPane.OK_OPTION){
+            UserInfoFormPanel userInfoFormPanel = userInfoFormDialog.getUserInfoFormPanel();
+            UserInfo userInfo = userInfoFormPanel.getEntityFromForm();
 
-        if(!ObjectUtils.isEmpty(userInfo.getId())){
-            userInfoService.update(userInfo);
-            userTableModel.updateData(userTablePaginationPanel.getTableUser().getSelectedRow(), userInfo);
-        }else{
-            userInfoService.save(userInfo);
-            userTableModel.addData(userInfo);
+            if(!ObjectUtils.isEmpty(userInfo.getId())){
+                userInfoService.update(userInfo);
+                userTableModel.updateData(userTablePaginationPanel.getTableUser().getSelectedRow(), userInfo);
+            }else{
+                userInfoService.save(userInfo);
+                userTableModel.addData(userInfo);
+            }
+
+            cancelSaveUserInfo();
         }
 
-        cancelSaveUserInfo();
     }
 
     private void cancelSaveUserInfo() {
@@ -184,6 +194,7 @@ public class UserController extends AbstractPanelController{
         jButton.setText("Edit");
 
         userInfoFormDialog.getUserInfoFormPanel().setEntityToForm(info);
+        userInfoFormDialog.setLocationRelativeTo(userTablePaginationPanel);
         userInfoFormDialog.setVisible(true);
     }
 

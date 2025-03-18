@@ -5,12 +5,18 @@
  */
 package com.learn.shirologin.ui.main.view;
 
+import com.learn.shirologin.ui.dashboard.view.DashboardPanel;
+import com.learn.shirologin.ui.login.view.LoginPanel;
 import com.learn.shirologin.util.Borders;
-import java.awt.Dimension;
+
+import java.awt.*;
 import javax.annotation.PostConstruct;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
+import com.learn.shirologin.util.ConstantParams;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
 
@@ -20,33 +26,35 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Getter
+@RequiredArgsConstructor
 public class MainFrame extends JFrame{
-    
-    @Setter
-    private boolean unsaved = false; 
-    
+    private JPanel cards;
+    private final LoginPanel loginPanel;
+    private final DashboardPanel dashboardPanel;
+
     @PostConstruct
     private void prepareFrame(){
+        setLayoutFrame();
         setFrameUp();
+    }
+
+    private void setLayoutFrame() {
+        cards = new JPanel(new CardLayout());
+        cards.add(loginPanel, ConstantParams.LOGIN_PANEL);
+        cards.add(dashboardPanel, ConstantParams.DASHBOARD_PANEL);
+        getContentPane().add(cards);
     }
 
     private void setFrameUp() {
         getRootPane().setBorder(Borders.createEmptyBorder());
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
     
-    public void showView(String title, JPanel jPanel, Dimension dimension){
-        setTitle(title);
-        
-        if(dimension != null){
-            setPreferredSize(dimension);
-        }else{
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
-        
-        getContentPane().removeAll();
-        add(jPanel);   
+    public void showViewCardPanel(String cardName){
+        CardLayout cl = (CardLayout)(cards.getLayout());
+        cl.show(cards, cardName);
     }
     
 }

@@ -45,13 +45,12 @@ public class ShiroLoginConfiguration {
         @Bean
         public UserSessionValidationScheduler userSessionValidationScheduler(@Autowired JdbcTemplate jdbcTemplate,
                                                                              @Autowired DefaultSessionManager sessionManager,
-                                                                             @Autowired LoginController loginController,
-                                                                             @Autowired MainFrame mainFrame){
+                                                                             @Autowired LoginController loginController
+                                                                             ){
             UserSessionValidationScheduler userSessionValidationScheduler = new UserSessionValidationScheduler();
             userSessionValidationScheduler.setJdbcTemplate(jdbcTemplate);
             userSessionValidationScheduler.setDefaultSessionManager(sessionManager);
             userSessionValidationScheduler.setLoginController(loginController);
-            userSessionValidationScheduler.setFrame(mainFrame);
             userSessionValidationScheduler.setInterval(10000);
             return userSessionValidationScheduler;
         }
