@@ -23,9 +23,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
 import javax.annotation.PostConstruct;
-import javax.swing.JButton;
-import javax.swing.JPanel;
-import javax.swing.JTable;
+import javax.swing.*;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -59,13 +58,25 @@ public class UserController extends AbstractPanelController{
         registerAction(userTablePaginationPanel.getBtnNext(), (e) -> showNextData());
         registerAction(userTablePaginationPanel.getBtnPrevious(), (e) -> showPreviousData());
         registerAction(userTablePaginationPanel.getBtnNew(), (e) -> showNewData());
-        registerAction(userTablePaginationPanel.getCbxPagePerSize(), (e) -> showDataPerPageSize(e));
-        registerAction(userInfoFormBtnPanel.getSaveBtn(), (e) -> saveUserInfo(e));
+        registerAction(userTablePaginationPanel.getBtnDelete(), this::deleteSelectedData);
+        registerAction(userTablePaginationPanel.getCbxPagePerSize(), this::showDataPerPageSize);
+        registerAction(userInfoFormBtnPanel.getSaveBtn(), this::saveUserInfo);
         registerAction(userInfoFormBtnPanel.getCancelBtn(), (e) -> cancelSaveUserInfo());
         registerMouseListener(userTablePaginationPanel.getTableUser(), onClickedTableUser());
     }
-    
-   
+
+    private void deleteSelectedData(ActionEvent e) {
+        int index = userTablePaginationPanel.getTableUser().getSelectedRow();
+        if(index == -1){
+            JOptionPane.showMessageDialog(userTablePaginationPanel,
+                    "Please selected data !","Warning",JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        UserInfo dataByRow = userTableModel.getDataByRow(index);
+        userInfoService.delete(dataByRow);
+        userTableModel.removeData(index);
+    }
+
 
     private void showFirstData() {
         if(!pageUserInfo.isFirst()){
