@@ -35,13 +35,6 @@ public class UserInfoServiceImpl implements UserInfoService{
             UsernamePasswordToken token = new UsernamePasswordToken(username, password);
             // get the Subject instance for the current thread
             Subject currentUser = SecurityUtils.getSubject();
-            if (currentUser == null)
-                return;
-            currentUser.logout();
-
-            Session session = currentUser.getSession(false);
-            if (session != null)
-                session.stop();
         // attempt to authenticate the user
             currentUser.login(token);
     }

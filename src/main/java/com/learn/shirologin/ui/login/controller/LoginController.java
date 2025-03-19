@@ -41,6 +41,10 @@ public class LoginController extends AbstractFrameController{
         registerAction(loginPanel.getButtonLogin(), (e) -> submitLogin());
         registerAction(loginPanel.getButtonCancel(), (e) -> cancelLogin());
         
+        viewToLoginPanel();
+    }
+
+    public void viewToLoginPanel() {
         mainFrame.showViewCardPanel(ConstantParams.LOGIN_PANEL);
     }
 
@@ -49,12 +53,13 @@ public class LoginController extends AbstractFrameController{
         LoginEntity loginEntity = loginPanel.getRequestFromForm();
         try {
             userInfoService.login(loginEntity.getUsername(), loginEntity.getPassword());
-            Subject subject = SecurityUtils.getSubject();
-            log.info("Authenticated : {}" , subject.isAuthenticated());
         } catch (Exception e) {
             log.error(e.getMessage());
             throw new AuthenticationException(e.getMessage());
         }
+        Subject subject = SecurityUtils.getSubject();
+        log.info("Authenticated : {}" , subject.isAuthenticated());
+
         loginPanel.clearForm();
         dashboardController.prepareAndOpenFrame();
         

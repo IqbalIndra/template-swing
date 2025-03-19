@@ -4,8 +4,10 @@ import com.learn.shirologin.ui.login.controller.LoginController;
 import com.learn.shirologin.ui.main.view.MainFrame;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.*;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.ReflectionUtils;
@@ -72,7 +74,11 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
                     ReflectionUtils.invokeMethod(validateMethod, defaultSessionManager, session, new DefaultSessionKey(session.getId()));
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "Login Expired. Please login !", "Session",JOptionPane.ERROR_MESSAGE);
-                    loginController.prepareAndOpenFrame();
+                    Subject subject = SecurityUtils.getSubject();
+                    if(subject.isAuthenticated())
+                        subject.logout();
+
+                    loginController.viewToLoginPanel();
                 }
             }
             start = start + size;
