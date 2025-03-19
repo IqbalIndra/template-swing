@@ -32,7 +32,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>1.18.26</version>
-                        <scope>provided</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -77,6 +77,17 @@
                     <groupId>io.codeworth</groupId>
                     <artifactId>PanelMatic</artifactId>
                     <version>0.9.9</version>
+                </dependency>
+                <dependency>
+                    <groupId>net.sf.jasperreports</groupId>
+                    <artifactId>jasperreports</artifactId>
+                    <version>6.20.0</version>
+                    <exclusions>
+                            <exclusion>
+                                    <groupId>commons-logging</groupId>
+                                    <artifactId>commons-logging</artifactId>
+                            </exclusion>
+                    </exclusions>
                 </dependency>
 	</dependencies>
 
