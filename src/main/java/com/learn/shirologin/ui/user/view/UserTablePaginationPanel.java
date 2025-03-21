@@ -34,6 +34,7 @@ public class UserTablePaginationPanel extends JPanel{
     private JButton btnFirst;
     private JButton btnNew;
     private JButton btnDelete;
+    private JButton btnViewReport;
     private JTable tableUser;
     private final UserTableModel userTableModel;
     private final UserPaginationComboBoxModel userPaginationComboBoxModel;
@@ -51,13 +52,14 @@ public class UserTablePaginationPanel extends JPanel{
 
     private JPanel createPanelPagination() {
         JPanel panel = new JPanel();
-        MigLayout migLayout = new MigLayout("wrap 3","[grow][][]");
+        MigLayout migLayout = new MigLayout("wrap 4","[grow][][][]");
         panel.setLayout(migLayout);
         
         JPanel panelLeft = createPanelLeftPagination();
         panel.add(panelLeft,"left");
         panel.add(btnNew,"right");
         panel.add(btnDelete,"right");
+        panel.add(btnViewReport,"right");
 
         return panel;
     }
@@ -81,7 +83,8 @@ public class UserTablePaginationPanel extends JPanel{
         btnFirst = new JButton("First");
         btnNew = new JButton("New");
         btnDelete = new JButton("Delete");
-        
+        btnViewReport = new JButton("View Report");
+
         panel.add(btnLast);
         panel.add(btnNext);
         panel.add(cbxPagePerSize);

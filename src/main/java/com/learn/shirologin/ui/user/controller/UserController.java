@@ -22,11 +22,18 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.swing.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
+import net.sf.jasperreports.view.JasperViewer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +54,8 @@ public class UserController extends AbstractPanelController{
     private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     private final UserRoleComboBoxModel userRoleComboBoxModel;
     private final UserInfoService userInfoService;
+    private final JasperReport userJasperReport;
+    private final JRSwapFileVirtualizer swapFileVirtualizer;
     private Page<UserInfo> pageUserInfo;
     
     @PostConstruct
@@ -59,10 +68,30 @@ public class UserController extends AbstractPanelController{
         registerAction(userTablePaginationPanel.getBtnPrevious(), (e) -> showPreviousData());
         registerAction(userTablePaginationPanel.getBtnNew(), (e) -> showNewData());
         registerAction(userTablePaginationPanel.getBtnDelete(), this::deleteSelectedData);
+        registerAction(userTablePaginationPanel.getBtnViewReport(), this::viewReport);
         registerAction(userTablePaginationPanel.getCbxPagePerSize(), this::showDataPerPageSize);
         registerAction(userInfoFormBtnPanel.getSaveBtn(), this::saveUserInfo);
         registerAction(userInfoFormBtnPanel.getCancelBtn(), (e) -> cancelSaveUserInfo());
         registerMouseListener(userTablePaginationPanel.getTableUser(), onClickedTableUser());
+    }
+
+    private void viewReport(ActionEvent actionEvent) {
+        List<UserInfo> userInfos = userTableModel.getDatas();
+        JRBeanCollectionDataSource jrBeanCollectionDataSource = new JRBeanCollectionDataSource(userInfos);
+
+        // Add parameters
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(JRParameter.REPORT_VIRTUALIZER, swapFileVirtualizer);
+
+        JasperPrint jasperPrint = null;
+        try {
+            jasperPrint = JasperFillManager.fillReport(userJasperReport, parameters,
+                    jrBeanCollectionDataSource);
+        } catch (JRException e) {
+            log.error("Error when fill report : {}", e.getMessage());
+        }
+
+        JasperViewer.viewReport(jasperPrint, false);
     }
 
     private void deleteSelectedData(ActionEvent e) {

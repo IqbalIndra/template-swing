@@ -42,6 +42,10 @@ public abstract class DefaultTableModel<T> extends AbstractTableModel{
         this.datas.addAll(datas);
         fireTableDataChanged();
     }
+
+    public List<T> getDatas(){
+        return datas;
+    }
     
     public T getDataByRow(int row){
         return datas.get(row);

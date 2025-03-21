@@ -57,3 +57,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### SWAP ###
+swap*
+
+### jasper ###
+*.jasper
