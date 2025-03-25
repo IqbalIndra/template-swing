@@ -5,20 +5,34 @@
  */
 package com.learn.shirologin.service;
 
+import com.learn.shirologin.ui.login.controller.LoginController;
+import com.learn.shirologin.util.Windows;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.SessionListenerAdapter;
+import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.swing.*;
 
 /**
  *
  * @author KBDSI-IQBAL
  */
 @Slf4j
+@RequiredArgsConstructor
 public class UserSessionListener extends SessionListenerAdapter{
+    private final LoginController loginController;
 
     @Override
     public void onExpiration(Session session) {
         log.info("Session Expired . {}",session.getId());
+
+        JOptionPane.showMessageDialog(null, "Login Expired. Please login !", "Session",JOptionPane.ERROR_MESSAGE);
+        Windows.closeAllDialogs();
+        loginController.viewToLoginPanel();
     }
 
     @Override

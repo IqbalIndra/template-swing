@@ -44,29 +44,28 @@ public class ShiroLoginConfiguration {
 
         @Bean
         public UserSessionValidationScheduler userSessionValidationScheduler(@Autowired JdbcTemplate jdbcTemplate,
-                                                                             @Autowired DefaultSessionManager sessionManager,
-                                                                             @Autowired LoginController loginController
+                                                                             @Autowired DefaultSessionManager sessionManager
                                                                              ){
             UserSessionValidationScheduler userSessionValidationScheduler = new UserSessionValidationScheduler();
             userSessionValidationScheduler.setJdbcTemplate(jdbcTemplate);
             userSessionValidationScheduler.setDefaultSessionManager(sessionManager);
-            userSessionValidationScheduler.setLoginController(loginController);
             userSessionValidationScheduler.setInterval(10000);
             return userSessionValidationScheduler;
         }
         
         @Bean
-        public SessionListener userSessionListener(){
-            return new UserSessionListener();
+        public SessionListener userSessionListener(@Autowired LoginController loginController){
+            return new UserSessionListener(loginController);
         }
         
         @Bean
         public DefaultSessionManager sessionManager(@Autowired SessionDAO sessionDAO,
+                                                    @Autowired SessionListener userSessionListener,
                                                     @Lazy @Autowired UserSessionValidationScheduler userSessionValidationScheduler){
             DefaultSessionManager defaultSessionManager = new DefaultSessionManager();
             defaultSessionManager.setGlobalSessionTimeout(180000);
             defaultSessionManager.setSessionValidationSchedulerEnabled(true);
-            defaultSessionManager.setSessionListeners(Arrays.asList(userSessionListener()));
+            defaultSessionManager.setSessionListeners(Arrays.asList(userSessionListener));
             defaultSessionManager.setSessionDAO(sessionDAO);
             defaultSessionManager.setDeleteInvalidSessions(true);
             defaultSessionManager.setSessionValidationScheduler(userSessionValidationScheduler);

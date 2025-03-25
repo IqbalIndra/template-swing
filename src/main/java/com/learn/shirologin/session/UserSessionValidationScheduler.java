@@ -2,6 +2,7 @@ package com.learn.shirologin.session;
 
 import com.learn.shirologin.ui.login.controller.LoginController;
 import com.learn.shirologin.ui.main.view.MainFrame;
+import com.learn.shirologin.util.Windows;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -25,7 +26,6 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
 
     private JdbcTemplate jdbcTemplate;
     private DefaultSessionManager defaultSessionManager;
-    private LoginController loginController;
     private ScheduledExecutorService scheduledExecutorService;
 
     @Setter
@@ -48,10 +48,6 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Autowired
-    public void setLoginController(LoginController loginController){
-        this.loginController = loginController;
-    }
 
     @Override
     public void run() {
@@ -73,12 +69,9 @@ public class UserSessionValidationScheduler implements SessionValidationSchedule
                     validateMethod.setAccessible(true);
                     ReflectionUtils.invokeMethod(validateMethod, defaultSessionManager, session, new DefaultSessionKey(session.getId()));
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "Login Expired. Please login !", "Session",JOptionPane.ERROR_MESSAGE);
                     Subject subject = SecurityUtils.getSubject();
                     if(subject.isAuthenticated())
                         subject.logout();
-
-                    loginController.viewToLoginPanel();
                 }
             }
             start = start + size;
