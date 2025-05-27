@@ -6,9 +6,10 @@
 package com.learn.shirologin.ui.user.view.modal;
 
 import java.awt.BorderLayout;
-import javax.annotation.PostConstruct;
 import javax.swing.JDialog;
 import javax.swing.WindowConstants;
+
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.stereotype.Component;

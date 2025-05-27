@@ -7,12 +7,13 @@ package com.learn.shirologin.ui.login.view;
 
 import com.learn.shirologin.ui.login.model.LoginEntity;
 import java.awt.Dimension;
-import javax.annotation.PostConstruct;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.miginfocom.swing.MigLayout;
 import org.apache.shiro.SecurityUtils;

@@ -8,7 +8,6 @@ package com.learn.shirologin.ui.user.view.modal;
 import com.learn.shirologin.model.UserInfo;
 import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.util.Borders;
-import javax.annotation.PostConstruct;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -16,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.util.Strings;

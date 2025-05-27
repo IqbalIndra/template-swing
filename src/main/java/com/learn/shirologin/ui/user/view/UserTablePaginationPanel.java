@@ -7,13 +7,14 @@ package com.learn.shirologin.ui.user.view;
 
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
 import com.learn.shirologin.ui.user.model.UserTableModel;
-import javax.annotation.PostConstruct;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
