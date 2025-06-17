@@ -5,11 +5,9 @@
  */
 package com.learn.shirologin.ui.user.view.modal;
 
-
+import javax.annotation.PostConstruct;
 import javax.swing.JButton;
 import javax.swing.JPanel;
-
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 

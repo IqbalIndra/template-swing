@@ -5,15 +5,18 @@
  */
 package com.learn.shirologin.ui.dashboard.view;
 
-import jakarta.annotation.PostConstruct;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.util.function.IntConsumer;
+import javax.annotation.PostConstruct;
+import javax.swing.JPanel;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTree;
+import javax.swing.tree.TreeSelectionModel;
 import lombok.Getter;
 import net.miginfocom.swing.MigLayout;
 import org.springframework.stereotype.Component;
-
-import javax.swing.*;
-import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
-import java.util.function.IntConsumer;
 
 /**
  *

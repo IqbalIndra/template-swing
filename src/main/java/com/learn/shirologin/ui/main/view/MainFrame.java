@@ -10,11 +10,11 @@ import com.learn.shirologin.ui.login.view.LoginPanel;
 import com.learn.shirologin.util.Borders;
 
 import java.awt.*;
+import javax.annotation.PostConstruct;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 import com.learn.shirologin.util.ConstantParams;
-import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
