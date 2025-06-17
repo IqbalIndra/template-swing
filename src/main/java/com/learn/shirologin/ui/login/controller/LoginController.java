@@ -23,6 +23,8 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.subject.Subject;
 import org.springframework.stereotype.Controller;
 
+import javax.swing.*;
+
 /**
  *
  * @author KBDSI-IQBAL
@@ -54,7 +56,7 @@ public class LoginController extends AbstractFrameController{
         try {
             userInfoService.login(loginEntity.getUsername(), loginEntity.getPassword());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            JOptionPane.showMessageDialog(loginPanel,e.getMessage(),"Error",JOptionPane.WARNING_MESSAGE);
             throw new AuthenticationException(e.getMessage());
         }
         Subject subject = SecurityUtils.getSubject();
