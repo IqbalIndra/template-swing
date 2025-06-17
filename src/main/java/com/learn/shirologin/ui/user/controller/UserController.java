@@ -54,7 +54,7 @@ public class UserController extends AbstractPanelController{
     private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     private final UserRoleComboBoxModel userRoleComboBoxModel;
     private final UserInfoService userInfoService;
-    private final JasperReport userJasperReport;
+    private final JasperReport userInfoReport;
     private final JRSwapFileVirtualizer swapFileVirtualizer;
     private Page<UserInfo> pageUserInfo;
     
@@ -85,7 +85,7 @@ public class UserController extends AbstractPanelController{
 
         JasperPrint jasperPrint = null;
         try {
-            jasperPrint = JasperFillManager.fillReport(userJasperReport, parameters,
+            jasperPrint = JasperFillManager.fillReport(userInfoReport, parameters,
                     jrBeanCollectionDataSource);
         } catch (JRException e) {
             log.error("Error when fill report : {}", e.getMessage());

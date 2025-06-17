@@ -8,13 +8,18 @@ import net.sf.jasperreports.engine.fill.JRSwapFileVirtualizer;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.engine.util.JRSaver;
 import net.sf.jasperreports.engine.util.JRSwapFile;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.nio.file.Files;
 
 @Configuration
 public class JasperReportConfiguration {
@@ -34,15 +39,32 @@ public class JasperReportConfiguration {
     }
 
     @Bean
-    JasperReport userInfoReport() throws JRException, FileNotFoundException {
+    public File initReportFolderPath(
+            @Value("${report.path}") String reportPath) {
+        File directory = new File(reportPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }else{
+            directory.delete();
+        }
+        return directory;
+    }
+
+    @Bean
+    @DependsOn({"initReportFolderPath"})
+    JasperReport userInfoReport(@Value("${report.path}") String reportPath) throws JRException, IOException {
         JasperReport jr;
-        File f = new File("src/main/resources/report/user-report.jasper");
-        if (f.exists()) {
-            jr = (JasperReport) JRLoader.loadObject(f);
+        String separator = File.separator;
+
+        File file = new File(reportPath+separator+"user-report.jasper");
+        if (file.exists()) {
+            InputStream inputStream = Files.newInputStream(file.toPath());
+            jr = (JasperReport) JRLoader.loadObject(inputStream);
         } else {
-            File file = ResourceUtils.getFile("classpath:report/user-report.jrxml");
-            jr = JasperCompileManager.compileReport(file.getAbsolutePath());
-            JRSaver.saveObject(jr, "src/main/resources/report/user-report.jasper");
+            ClassPathResource resource = new ClassPathResource("report/user-report.jrxml");
+            jr = JasperCompileManager.compileReport(resource.getInputStream());
+
+            JRSaver.saveObject(jr, reportPath+separator+"user-report.jasper");
         }
         return jr;
     }

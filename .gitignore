@@ -63,3 +63,6 @@ swap*
 
 ### jasper ###
 *.jasper
+
+### Folder Report Compile ###
+report/
