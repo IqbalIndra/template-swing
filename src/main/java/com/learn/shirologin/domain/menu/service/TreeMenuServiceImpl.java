@@ -24,7 +24,8 @@ public class TreeMenuServiceImpl implements TreeMenuService{
         treeMenus.add(new TreeMenu("C001", "Dashboard", "P001","com.learn.shirologin.ui.dashboard.view.DashboardPanel"));
         treeMenus.add(new TreeMenu("C002", "Login", "P001","com.learn.shirologin.ui.login.view.LoginPanel"));
         treeMenus.add(new TreeMenu("C003", "User", "P001","com.learn.shirologin.ui.user.controller.UserController"));
-        
+        treeMenus.add(new TreeMenu("C004", "SAW", "P001","com.learn.shirologin.ui.swa.controller.AlternativeDataSourceController"));
+
         TreeMenu treeMenuFirst = treeMenus.get(0);
         String parentCode = treeMenuFirst.getCode();
         DefaultMutableTreeNode parent = new DefaultMutableTreeNode(treeMenuFirst.getParentCode(),true);
