@@ -140,8 +140,9 @@ public class UserController extends AbstractPanelController{
         userInfoFormDialog.getUserInfoFormPanel().clearForm();
         userInfoFormDialog.getUserInfoFormPanel().enabledComponent(true);
         userInfoFormDialog.getUserInfoFormBtnPanel().getSaveBtn().setText("Save");
-        userInfoFormDialog.setVisible(true);
         userInfoFormDialog.setLocationRelativeTo(userTablePaginationPanel);
+        userInfoFormDialog.pack();
+        userInfoFormDialog.setVisible(true);
     }
 
     private void loadEntities(Pageable pageable) {

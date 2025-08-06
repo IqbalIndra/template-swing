@@ -49,7 +49,7 @@ public class ShiroLoginConfiguration {
             UserSessionValidationScheduler userSessionValidationScheduler = new UserSessionValidationScheduler();
             userSessionValidationScheduler.setJdbcTemplate(jdbcTemplate);
             userSessionValidationScheduler.setDefaultSessionManager(sessionManager);
-            userSessionValidationScheduler.setInterval(10000);
+            userSessionValidationScheduler.setInterval(1000000);
             return userSessionValidationScheduler;
         }
         

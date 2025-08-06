@@ -66,3 +66,8 @@ swap*
 
 ### Folder Report Compile ###
 report/
+### Folder Upload Compile ###
+upload/
+
+### JREBEL ###
+rebel*

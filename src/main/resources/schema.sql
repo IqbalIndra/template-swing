@@ -41,10 +41,10 @@ drop table if exists swa_alternative_data_source;
 create table swa_alternative_data_source (
       id bigint primary key auto_increment,
       code varchar(10) not null,
-      school_year varchar(4) not null,
+      school_year varchar(9) not null,
       major varchar(20) not null,
       class_room varchar(10) not null,
-      file_source BLOB not null,
+      filename varchar(250) not null,
       status varchar(100) not null,
       is_deleted boolean not null
 );

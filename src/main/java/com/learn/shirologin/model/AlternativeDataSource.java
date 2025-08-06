@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.Serializable;
 
 @Data
@@ -17,8 +16,8 @@ public class AlternativeDataSource implements Serializable {
     private String schoolYear;
     private String major;
     private String classRoom;
-    private InputStream inputStreamFileSource;
     private File fileSource;
+    private String filename;
     private StatusAlternative status;
     private boolean deleted;
 

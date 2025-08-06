@@ -1,6 +1,7 @@
 package com.learn.shirologin.service;
 
 import com.learn.shirologin.model.AlternativeDataSource;
+import com.learn.shirologin.model.StatusAlternative;
 import com.learn.shirologin.repository.AlternativeDataSourceRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,6 +20,7 @@ public class AlternativeDataSourceServiceImpl implements AlternativeDataSourceSe
 
     @Override
     public AlternativeDataSource save(AlternativeDataSource alternativeDataSource) {
+        alternativeDataSource.setStatus(StatusAlternative.ON_PROCESS);
         return alternativeDataSourceRepository.save(alternativeDataSource);
     }
 

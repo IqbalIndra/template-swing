@@ -3,23 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.learn.shirologin.ui.user.view.modal;
+package com.learn.shirologin.ui.swa.view.modal;
 
+import com.learn.shirologin.model.AlternativeDataSource;
+import com.learn.shirologin.model.StatusAlternative;
 import com.learn.shirologin.model.UserInfo;
+import com.learn.shirologin.ui.swa.model.JurusanComboBoxModel;
+import com.learn.shirologin.ui.swa.model.KelasComboBoxModel;
+import com.learn.shirologin.ui.swa.model.TahunAjaranComboBoxModel;
 import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.util.Borders;
-import javax.annotation.PostConstruct;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JPasswordField;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import com.learn.shirologin.util.IOFile;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.File;
+import java.util.Optional;
 
 /**
  *
@@ -27,17 +33,31 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @RequiredArgsConstructor
-public class UserInfoFormPanel extends JPanel{
-    private final UserRoleComboBoxModel userRoleComboBoxModel;
-    private JLabel usernameLbl;
-    private JLabel emailLbl;
-    private JLabel passwordLbl;
-    private JLabel roleLbl;
-    private JTextField usernameTxt;
-    private JTextField emailTxt;
-    private JPasswordField passwordTxt;
-    private JComboBox userRoleComboBox;
-    private UserInfo entity;
+public class AlternativeDataSourceFormPanel extends JPanel{
+    private final TahunAjaranComboBoxModel tahunAjaranComboBoxModel;
+    private final JurusanComboBoxModel jurusanComboBoxModel;
+    private final KelasComboBoxModel kelasComboBoxModel;
+    private final IOFile ioFile;
+    private JLabel kodeLbl;
+    private JLabel tahunAjaranLbl;
+    private JLabel jurusanLbl;
+    private JLabel kelasLbl;
+    private JLabel dataSourceLbl;
+    @Getter
+    private JLabel dataSourceFilenameLbl;
+    private JTextField kodeTxt;
+    private JComboBox tahunAjaranComboBox;
+    private JComboBox jurusanComboBox;
+    private JComboBox kelasComboBox;
+    @Getter
+    private JButton btnUploadDataSource;
+    @Getter
+    private JFileChooser jFileChooser;
+    private AlternativeDataSource entity;
+    @Getter
+    private JButton saveBtn;
+    @Getter
+    private JButton cancelBtn;
 
     
     @PostConstruct
@@ -47,39 +67,56 @@ public class UserInfoFormPanel extends JPanel{
     }
 
     private void initComponents() {
-        usernameLbl = new JLabel("Username:");
-        emailLbl = new JLabel("Email:");
-        passwordLbl = new JLabel("Password:");
-        roleLbl = new JLabel("Role:");
-        usernameTxt = new JTextField(20);
-        emailTxt = new JTextField(50);
-        passwordTxt = new JPasswordField(20);
-        userRoleComboBox = new JComboBox<>(userRoleComboBoxModel);    
-        
-        add(usernameLbl,"left");
-        add(usernameTxt,"pushx,growx");
-        add(emailLbl,"left");
-        add(emailTxt,"pushx,growx");
-        add(passwordLbl,"left");
-        add(passwordTxt,"pushx,growx");
-        add(roleLbl,"left");
-        add(userRoleComboBox,"pushx,growx");
+        kodeLbl = new JLabel("Kode:");
+        tahunAjaranLbl = new JLabel("Tahun Ajaran:");
+        jurusanLbl = new JLabel("Jurusan:");
+        kelasLbl = new JLabel("Kelas:");
+        dataSourceLbl = new JLabel("");
+        dataSourceFilenameLbl = new JLabel("");
+        btnUploadDataSource = new JButton("...");
+        kodeTxt = new JTextField(50);
+        tahunAjaranComboBox = new JComboBox<>(tahunAjaranComboBoxModel);
+        jurusanComboBox = new JComboBox<>(jurusanComboBoxModel);
+        kelasComboBox = new JComboBox<>(kelasComboBoxModel);
+        jFileChooser = new JFileChooser();
+        jFileChooser.setFileFilter(new FileNameExtensionFilter("Comma Separated Values (*.csv)", "csv"));
+
+        saveBtn = new JButton("Save");
+        cancelBtn = new JButton("Cancel");
+
+        add(kodeLbl,"split 2,sg a");
+        add(kodeTxt,"pushx,growx,wrap");
+        add(tahunAjaranLbl,"split 2,sg a");
+        add(tahunAjaranComboBox,"pushx,growx,wrap");
+        add(jurusanLbl,"split 2, sg a");
+        add(jurusanComboBox,"pushx,growx,wrap");
+        add(kelasLbl,"split 2, sg a");
+        add(kelasComboBox,"pushx,growx,wrap");
+        add(dataSourceLbl,"split 3, sg a");
+        add(dataSourceFilenameLbl,"pushx,growx");
+        add(btnUploadDataSource, "wrap 10");
+        add(saveBtn, "split 2, align center");
+        add(cancelBtn, "align center");
     }
 
     private void setPanelUp() {
         setBorder(Borders.createEmptyBorder());
-        setLayout(new MigLayout("wrap 2","[]10[]"));
+        setLayout(new MigLayout("","",""));
     }
     
-    public UserInfo getEntityFromForm(){
-        if(entity == null){
-            entity = UserInfo.of().build();
+    public AlternativeDataSource getEntityFromForm(){
+        Optional<AlternativeDataSource> optionalEntity = Optional.ofNullable(entity);
+        if(!optionalEntity.isPresent()){
+            entity = AlternativeDataSource.of().build();
         }
 
-        entity.setUsername(usernameTxt.getText());
-        entity.setEmail(emailTxt.getText());
-        entity.setPassword(String.valueOf(passwordTxt.getPassword()));
-        entity.setRole(userRoleComboBoxModel.getSelectedItem());
+        entity.setCode(kodeTxt.getText());
+        entity.setMajor(jurusanComboBoxModel.getSelectedItem());
+        entity.setSchoolYear(tahunAjaranComboBoxModel.getSelectedItem());
+        entity.setClassRoom(kelasComboBoxModel.getSelectedItem());
+        entity.setFileSource(jFileChooser.getSelectedFile());
+        entity.setFilename(jFileChooser.getSelectedFile().getName());
+
 
         return entity;
     }
@@ -87,30 +124,33 @@ public class UserInfoFormPanel extends JPanel{
     public void clearForm(){
         this.entity = null;
 
-        usernameTxt.setText(Strings.EMPTY);
-        emailTxt.setText(Strings.EMPTY);
-        passwordTxt.setText(Strings.EMPTY);
-        userRoleComboBox.setSelectedIndex(0);
+        kodeTxt.setText(Strings.EMPTY);
+        jurusanComboBox.setSelectedIndex(0);
+        tahunAjaranComboBox.setSelectedIndex(0);
+        kelasComboBox.setSelectedIndex(0);
+        dataSourceFilenameLbl.setText("Tidak ada file");
     }
 
     public void enabledComponent(boolean enabled){
-        usernameTxt.setEditable(enabled);
-        usernameTxt.setEnabled(enabled);
-        emailTxt.setEditable(enabled);
-        emailTxt.setEnabled(enabled);
-        passwordTxt.setEditable(enabled);
-        passwordTxt.setEnabled(enabled);
-        userRoleComboBox.setEnabled(enabled);
+        kodeTxt.setEditable(enabled);
+        kodeTxt.setEnabled(enabled);
+        jurusanComboBox.setEnabled(enabled);
+        tahunAjaranComboBox.setEnabled(enabled);
+        kelasComboBox.setEnabled(enabled);
+        btnUploadDataSource.setEnabled(enabled);
     }
 
-    public void setEntityToForm(UserInfo info){
-        this.entity = info;
+    public void setEntityToForm(AlternativeDataSource alternativeDataSource){
+        this.entity = alternativeDataSource;
 
-        usernameTxt.setText(entity.getUsername());
-        emailTxt.setText(entity.getEmail());
-        passwordTxt.setText(entity.getPassword());
-        userRoleComboBoxModel.setSelectedItem(entity.getRole());
+        kodeTxt.setText(entity.getCode());
+        jurusanComboBox.setSelectedItem(entity.getMajor());
+        kelasComboBox.setSelectedItem(entity.getClassRoom());
+        tahunAjaranComboBox.setSelectedItem(entity.getSchoolYear());
+        dataSourceFilenameLbl.setText(entity.getFilename());
 
+        File file = ioFile.getUploadFile(alternativeDataSource.getFilename());
+        jFileChooser.setSelectedFile(file);
 
         enabledComponent(false);
     }

@@ -38,7 +38,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
                                             .schoolYear(rs.getString("school_year"))
                                             .id(rs.getLong("id"))
                                             .status(StatusAlternative.valueOfStatus(rs.getString("status")))
-                                            .inputStreamFileSource(rs.getBinaryStream("file_source"))
+                                            .filename(rs.getString("filename"))
                                             .deleted(rs.getBoolean("is_deleted"))
                                             .build()
                             ),
@@ -53,7 +53,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
     @Override
     public AlternativeDataSource save(AlternativeDataSource alternativeDataSource) {
         String sql = "INSERT INTO swa_alternative_data_source (" +
-                "major,code,class_room,school_year,status,file_source,is_deleted" +
+                "major,code,class_room,school_year,status,filename,is_deleted" +
                 ") VALUES (?,?,?,?,?,?,false) ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -65,13 +65,8 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
             ps.setString(3, alternativeDataSource.getClassRoom());
             ps.setString(4, alternativeDataSource.getSchoolYear());
             ps.setString(5, alternativeDataSource.getStatus().name());
-
-            try (FileInputStream fis = new FileInputStream(alternativeDataSource.getFileSource())) {
-                ps.setBinaryStream(6, fis, alternativeDataSource.getFileSource().length());
-                return ps;
-            }  catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            ps.setString(6, alternativeDataSource.getFilename());
+            return ps;
         }, keyHolder);
 
         alternativeDataSource.setId((long)keyHolder.getKey());
@@ -81,7 +76,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
 
     @Override
     public AlternativeDataSource update(AlternativeDataSource alternativeDataSource) {
-        String sql = "UPDATE swa_alternative_data_source SET major=?,code=?,class_room=?,school_year=?,status=?,file_source=? WHERE id=? ";
+        String sql = "UPDATE swa_alternative_data_source SET major=?,code=?,class_room=?,school_year=?,status=?,filename=? WHERE id=? ";
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
@@ -91,13 +86,11 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
             ps.setString(3, alternativeDataSource.getClassRoom());
             ps.setString(4, alternativeDataSource.getSchoolYear());
             ps.setString(5, alternativeDataSource.getStatus().name());
+            ps.setString(6, alternativeDataSource.getFilename());
+            ps.setLong(7, alternativeDataSource.getId());
 
-            try (FileInputStream fis = new FileInputStream(alternativeDataSource.getFileSource())) {
-                ps.setBinaryStream(6, fis, alternativeDataSource.getFileSource().length());
-                return ps;
-            }  catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            return ps;
+
 
         });
 
@@ -125,15 +118,15 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
                 "select * from swa_alternative_data_source WHERE is_deleted=false",
                 (rs, rowNum) ->
                         AlternativeDataSource.of()
-                            .major(rs.getString("major"))
-                            .code(rs.getString("code"))
-                            .classRoom(rs.getString("class_room"))
-                            .schoolYear(rs.getString("school_year"))
-                            .id(rs.getLong("id"))
-                            .status(StatusAlternative.valueOfStatus(rs.getString("status")))
-                            .inputStreamFileSource(rs.getBinaryStream("file_source"))
-                            .deleted(rs.getBoolean("is_deleted"))
-                            .build()
+                                .major(rs.getString("major"))
+                                .code(rs.getString("code"))
+                                .classRoom(rs.getString("class_room"))
+                                .schoolYear(rs.getString("school_year"))
+                                .id(rs.getLong("id"))
+                                .status(StatusAlternative.valueOfStatus(rs.getString("status")))
+                                .filename(rs.getString("filename"))
+                                .deleted(rs.getBoolean("is_deleted"))
+                                .build()
 
         );
     }
@@ -160,7 +153,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
                         .schoolYear(rs.getString("school_year"))
                         .id(rs.getLong("id"))
                         .status(StatusAlternative.valueOfStatus(rs.getString("status")))
-                        .inputStreamFileSource(rs.getBinaryStream("file_source"))
+                        .filename(rs.getString("filename"))
                         .deleted(rs.getBoolean("is_deleted"))
                         .build()
         );
