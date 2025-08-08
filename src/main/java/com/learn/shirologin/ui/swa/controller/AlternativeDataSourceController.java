@@ -6,18 +6,13 @@
 package com.learn.shirologin.ui.swa.controller;
 
 import com.learn.shirologin.model.AlternativeDataSource;
-import com.learn.shirologin.model.UserInfo;
 import com.learn.shirologin.service.AlternativeDataSourceService;
 import com.learn.shirologin.ui.base.controller.AbstractPanelController;
-import com.learn.shirologin.ui.swa.model.AlternativeDataSourceTableModel;
-import com.learn.shirologin.ui.swa.model.JurusanComboBoxModel;
-import com.learn.shirologin.ui.swa.model.KelasComboBoxModel;
-import com.learn.shirologin.ui.swa.model.TahunAjaranComboBoxModel;
+import com.learn.shirologin.ui.swa.model.*;
 import com.learn.shirologin.ui.swa.view.AlternativeDataSourceTablePaginationPanel;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormDialog;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormPanel;
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
-import com.learn.shirologin.ui.user.view.modal.UserInfoFormPanel;
 import com.learn.shirologin.util.IOFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,13 +29,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.io.FileReader;
 import java.time.Year;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  *
@@ -147,9 +140,52 @@ public class AlternativeDataSourceController extends AbstractPanelController{
             ioFile.createUploadFile(alternativeDataSource.getFileSource(),
                     alternativeDataSource.getFilename());
 
-            cancelAlternativeDataSource();
+            showAlternativeDetailView(alternativeDataSource);
         }
 
+    }
+
+    private void showAlternativeDetailView(AlternativeDataSource alternativeDataSource) {
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+
+        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
+
+        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
+        alternativeDataSourceFormPanel.showAlternativeDetailTable(alternativeDetailTableModel);
+
+        alternativeDataSourceFormPanel.getSaveBtn().setText("Edit");
+        alternativeDataSourceFormPanel.enabledComponent(false);
+
+        alternativeDataSourceFormDialog.pack();
+    }
+
+    private void loadAlternativeDetailData(AlternativeDetailTableModel alternativeDetailTableModel, File fileSource) {
+        try {
+            BufferedReader br = new BufferedReader(new FileReader(fileSource));
+            String firstLine = br.readLine().trim();
+            String[] columnsName = firstLine.split(",");
+
+            for(int i = 2; i<columnsName.length; i++){
+                columnsName[i] = String.format("C%d",i-1);
+            }
+
+            alternativeDetailTableModel.setColumnLabel(columnsName);
+
+            // get lines from txt file
+            Object[] tableLines = br.lines().toArray();
+
+            // extratct data from lines
+            // set data to jtable model
+            for(int i = 0; i < tableLines.length; i++)
+            {
+                String line = tableLines[i].toString().trim();
+                Object[] dataRow = line.split(",");
+                alternativeDetailTableModel.addData(Arrays.asList(dataRow));
+            }
+
+        } catch (Exception ex) {
+            log.error("Error Populate data from file : {}",ex.getMessage());
+        }
     }
 
     private void cancelAlternativeDataSource() {
@@ -159,10 +195,17 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     }
 
     private void showViewData(AlternativeDataSource alternativeDataSource){
-        JButton jButton = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getSaveBtn();
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+
+        JButton jButton = alternativeDataSourceFormPanel.getSaveBtn();
         jButton.setText("Edit");
 
-        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().setEntityToForm(alternativeDataSource);
+        alternativeDataSourceFormPanel.setEntityToForm(alternativeDataSource);
+
+        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
+        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
+        alternativeDataSourceFormPanel.showAlternativeDetailTable(alternativeDetailTableModel);
+
         alternativeDataSourceFormDialog.setLocationRelativeTo(alternativeDataSourceTablePaginationPanel);
         alternativeDataSourceFormDialog.pack();
         alternativeDataSourceFormDialog.setVisible(true);

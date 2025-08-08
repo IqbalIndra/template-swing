@@ -29,9 +29,8 @@ public class UserSessionListener extends SessionListenerAdapter{
     @Override
     public void onExpiration(Session session) {
         log.info("Session Expired . {}",session.getId());
-
-        JOptionPane.showMessageDialog(null, "Login Expired. Please login !", "Session",JOptionPane.ERROR_MESSAGE);
         Windows.closeAllDialogs();
+        JOptionPane.showMessageDialog(null, "Login Expired. Please login !", "Session",JOptionPane.ERROR_MESSAGE);
         loginController.viewToLoginPanel();
     }
 

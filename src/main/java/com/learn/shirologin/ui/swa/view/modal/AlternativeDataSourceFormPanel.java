@@ -8,9 +8,7 @@ package com.learn.shirologin.ui.swa.view.modal;
 import com.learn.shirologin.model.AlternativeDataSource;
 import com.learn.shirologin.model.StatusAlternative;
 import com.learn.shirologin.model.UserInfo;
-import com.learn.shirologin.ui.swa.model.JurusanComboBoxModel;
-import com.learn.shirologin.ui.swa.model.KelasComboBoxModel;
-import com.learn.shirologin.ui.swa.model.TahunAjaranComboBoxModel;
+import com.learn.shirologin.ui.swa.model.*;
 import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.util.Borders;
 import com.learn.shirologin.util.IOFile;
@@ -58,6 +56,12 @@ public class AlternativeDataSourceFormPanel extends JPanel{
     private JButton saveBtn;
     @Getter
     private JButton cancelBtn;
+    @Getter
+    private JPanel panelAlternative;
+    @Getter
+    private JTable tableAlternativeDetail;
+    @Getter
+    private final AlternativeDetailTableModel alternativeDetailTableModel;
 
     
     @PostConstruct
@@ -84,6 +88,8 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         saveBtn = new JButton("Save");
         cancelBtn = new JButton("Cancel");
 
+        panelAlternative = getAlternativePanel();
+
         add(kodeLbl,"split 2,sg a");
         add(kodeTxt,"pushx,growx,wrap");
         add(tahunAjaranLbl,"split 2,sg a");
@@ -96,12 +102,13 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         add(dataSourceFilenameLbl,"pushx,growx");
         add(btnUploadDataSource, "wrap 10");
         add(saveBtn, "split 2, align center");
-        add(cancelBtn, "align center");
+        add(cancelBtn, "align center, wrap");
+        add(panelAlternative,"span 2, push , grow, wrap");
     }
 
     private void setPanelUp() {
         setBorder(Borders.createEmptyBorder());
-        setLayout(new MigLayout("","",""));
+        setLayout(new MigLayout("wrap 2","[] [grow]","[] [grow]"));
     }
     
     public AlternativeDataSource getEntityFromForm(){
@@ -153,5 +160,27 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         jFileChooser.setSelectedFile(file);
 
         enabledComponent(false);
+    }
+
+    public void showAlternativeDetailTable(AlternativeDetailTableModel alternativeDetailTableModel){
+        tableAlternativeDetail.setModel(alternativeDetailTableModel);
+        panelAlternative.setVisible(true);
+    }
+
+    private JPanel getAlternativePanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 1","[grow]"));
+        panel.add(createTable(), "grow");
+        panel.setVisible(false);
+        return panel;
+    }
+
+    private JScrollPane createTable() {
+        tableAlternativeDetail = new JTable();
+        tableAlternativeDetail.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableAlternativeDetail.setFillsViewportHeight(true);
+
+        JScrollPane paneWithTable = new JScrollPane(tableAlternativeDetail);
+        return paneWithTable;
     }
 }
