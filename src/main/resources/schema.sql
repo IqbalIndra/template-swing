@@ -30,11 +30,26 @@ drop table if exists swa_criteria;
 
 create table swa_criteria(
     id bigint primary key auto_increment,
-    name varchar(10) not null unique,
+    name varchar(50) not null unique,
+    type varchar(10),
     weight double precision not null,
-    ordering int not null,
     is_deleted boolean not null
 );
+
+drop table if exists swa_sub_criteria;
+
+create table swa_sub_criteria(
+     id bigint primary key auto_increment,
+     swa_criteria_id bigint ,
+     name varchar(50) not null,
+     operator varchar(3),
+     min_value double precision not null,
+     max_value double precision not null,
+     weight double precision not null,
+     is_deleted boolean not null,
+     FOREIGN KEY (swa_criteria_id) REFERENCES swa_criteria(id)
+);
+
 
 drop table if exists swa_alternative_data_source;
 

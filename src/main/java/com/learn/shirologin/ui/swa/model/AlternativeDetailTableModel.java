@@ -21,4 +21,31 @@ public class AlternativeDetailTableModel extends DefaultTableModel<List<Object>>
         List<Object> dataByRow = getDataByRow(rowIndex);
         return dataByRow.get(columnIndex);
     }
+
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        List<Object> dataByRow = getDataByRow(rowIndex);
+        dataByRow.set(columnIndex,aValue);
+        fireTableCellUpdated(rowIndex,columnIndex);
+    }
+
+    public Double getMaxDataByColumn(int columnIndex){
+        return datas.stream()
+                .filter(row -> row.size() > columnIndex) // avoid IndexOutOfBounds
+                .map(row -> (String) row.get(columnIndex))
+                .mapToDouble(Double::parseDouble) // convert String to Integer if needed
+                .max()
+                .orElse(0d);
+    }
+
+    public Double getMinDataByColumn(int columnIndex){
+        return datas.stream()
+                .filter(row -> row.size() > columnIndex) // avoid IndexOutOfBounds
+                .map(row -> (String) row.get(columnIndex))
+                .mapToDouble(Double::parseDouble) // convert String to Integer if needed
+                .min()
+                .orElse(0d);
+    }
+
 }

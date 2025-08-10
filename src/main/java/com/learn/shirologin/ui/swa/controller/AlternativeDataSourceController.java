@@ -6,8 +6,11 @@
 package com.learn.shirologin.ui.swa.controller;
 
 import com.learn.shirologin.model.AlternativeDataSource;
+import com.learn.shirologin.model.CriteriaItem;
 import com.learn.shirologin.service.AlternativeDataSourceService;
+import com.learn.shirologin.service.CriteriaService;
 import com.learn.shirologin.ui.base.controller.AbstractPanelController;
+import com.learn.shirologin.ui.swa.calculation.AlternativeCalculation;
 import com.learn.shirologin.ui.swa.model.*;
 import com.learn.shirologin.ui.swa.view.AlternativeDataSourceTablePaginationPanel;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormDialog;
@@ -34,6 +37,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.time.Year;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -48,11 +52,14 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     private final AlternativeDataSourceTableModel alternativeDataSourceTableModel;
     private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     private final AlternativeDataSourceService alternativeDataSourceService;
+    private final CriteriaService criteriaService;
+    private final AlternativeCalculation alternativeCalculation;
     private final IOFile ioFile;
     private Page<AlternativeDataSource> pageAlternativeDataSource;
     private final TahunAjaranComboBoxModel tahunAjaranComboBoxModel;
     private final KelasComboBoxModel kelasComboBoxModel;
     private final JurusanComboBoxModel jurusanComboBoxModel;
+    private final CriteriaComboBoxModel criteriaComboBoxModel;
     
     @PostConstruct
     private void prepareListeners(){
@@ -68,8 +75,13 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         registerAction(alternativeDataSourceFormPanel.getBtnUploadDataSource(), (e)-> uploadDataSource());
         registerAction(alternativeDataSourceFormPanel.getSaveBtn(), this::saveAlternativeDataSource);
         registerAction(alternativeDataSourceFormPanel.getCancelBtn(), (e) -> cancelAlternativeDataSource());
+        registerAction(alternativeDataSourceFormPanel.getNormalizeBtn(), (e) -> tryNormalization());
 
         registerMouseListener(alternativeDataSourceTablePaginationPanel.getTableAlternativeDataSource(), onClickedTableUser());
+    }
+
+    private void tryNormalization() {
+        alternativeCalculation.tryToNormalization(criteriaComboBoxModel.getItemsSelected());
     }
 
     private void uploadDataSource() {
@@ -189,9 +201,12 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     }
 
     private void cancelAlternativeDataSource() {
-        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().clearForm();
+        /*alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().clearForm();
         alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getSaveBtn().setText("Save");
-        alternativeDataSourceFormDialog.dispose();
+        alternativeDataSourceFormDialog.dispose();*/
+
+        alternativeCalculation.tryToConvention(criteriaComboBoxModel.getItemsSelected());
+
     }
 
     private void showViewData(AlternativeDataSource alternativeDataSource){
@@ -252,7 +267,14 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         loadTahunAjaranComboBox();
         loadKelasComboBox();
         loadJurusanComboBox();
+        loadCriteriaComboBox();
         return alternativeDataSourceTablePaginationPanel;
+    }
+
+    private void loadCriteriaComboBox() {
+        criteriaComboBoxModel.clear();
+        List<CriteriaItem> criteriaItems = criteriaService.findCriteriaItem();
+        criteriaComboBoxModel.addElements(criteriaItems);
     }
 
     private void loadJurusanComboBox() {

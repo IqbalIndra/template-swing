@@ -8,6 +8,7 @@ package com.learn.shirologin.ui.swa.view.modal;
 import com.learn.shirologin.model.AlternativeDataSource;
 import com.learn.shirologin.model.StatusAlternative;
 import com.learn.shirologin.model.UserInfo;
+import com.learn.shirologin.ui.base.combobox.CheckedCombobox;
 import com.learn.shirologin.ui.swa.model.*;
 import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.util.Borders;
@@ -35,18 +36,21 @@ public class AlternativeDataSourceFormPanel extends JPanel{
     private final TahunAjaranComboBoxModel tahunAjaranComboBoxModel;
     private final JurusanComboBoxModel jurusanComboBoxModel;
     private final KelasComboBoxModel kelasComboBoxModel;
+    private final CriteriaComboBoxModel criteriaComboBoxModel;
     private final IOFile ioFile;
     private JLabel kodeLbl;
     private JLabel tahunAjaranLbl;
     private JLabel jurusanLbl;
     private JLabel kelasLbl;
     private JLabel dataSourceLbl;
+    private JLabel criteriaLbl;
     @Getter
     private JLabel dataSourceFilenameLbl;
     private JTextField kodeTxt;
     private JComboBox tahunAjaranComboBox;
     private JComboBox jurusanComboBox;
     private JComboBox kelasComboBox;
+    private JComboBox criteriaCombobox;
     @Getter
     private JButton btnUploadDataSource;
     @Getter
@@ -56,6 +60,8 @@ public class AlternativeDataSourceFormPanel extends JPanel{
     private JButton saveBtn;
     @Getter
     private JButton cancelBtn;
+    @Getter
+    private JButton normalizeBtn;
     @Getter
     private JPanel panelAlternative;
     @Getter
@@ -75,6 +81,7 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         tahunAjaranLbl = new JLabel("Tahun Ajaran:");
         jurusanLbl = new JLabel("Jurusan:");
         kelasLbl = new JLabel("Kelas:");
+        criteriaLbl = new JLabel("Criteria:");
         dataSourceLbl = new JLabel("");
         dataSourceFilenameLbl = new JLabel("");
         btnUploadDataSource = new JButton("...");
@@ -82,11 +89,13 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         tahunAjaranComboBox = new JComboBox<>(tahunAjaranComboBoxModel);
         jurusanComboBox = new JComboBox<>(jurusanComboBoxModel);
         kelasComboBox = new JComboBox<>(kelasComboBoxModel);
+        criteriaCombobox = new CheckedCombobox(criteriaComboBoxModel);
         jFileChooser = new JFileChooser();
         jFileChooser.setFileFilter(new FileNameExtensionFilter("Comma Separated Values (*.csv)", "csv"));
 
         saveBtn = new JButton("Save");
         cancelBtn = new JButton("Cancel");
+        normalizeBtn = new JButton("Normalize");
 
         panelAlternative = getAlternativePanel();
 
@@ -101,8 +110,11 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         add(dataSourceLbl,"split 3, sg a");
         add(dataSourceFilenameLbl,"pushx,growx");
         add(btnUploadDataSource, "wrap 10");
-        add(saveBtn, "split 2, align center");
-        add(cancelBtn, "align center, wrap");
+        add(criteriaLbl, "split 2, sg a");
+        add(criteriaCombobox, "pushx,growx,wrap");
+        add(saveBtn, "split 3, align center");
+        add(cancelBtn, "align center");
+        add(normalizeBtn, "align center, wrap");
         add(panelAlternative,"span 2, push , grow, wrap");
     }
 
