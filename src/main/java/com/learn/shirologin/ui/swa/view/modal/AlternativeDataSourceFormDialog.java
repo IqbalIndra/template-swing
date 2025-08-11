@@ -30,7 +30,7 @@ import java.awt.event.WindowListener;
 @Component
 public class AlternativeDataSourceFormDialog extends JDialog{
     private final AlternativeDataSourceFormPanel alternativeDataSourceFormPanel;
-    private final UserInfoFormPanel userInfoFormPanel;
+    private final AlternativeDataSourceFormBtnPanel alternativeDataSourceFormBtnPanel;
     
     @PostConstruct
     private void prepareDialog(){
@@ -48,6 +48,7 @@ public class AlternativeDataSourceFormDialog extends JDialog{
 
     private void initComponents() {
         add(alternativeDataSourceFormPanel,BorderLayout.CENTER);
+        add(alternativeDataSourceFormBtnPanel, BorderLayout.SOUTH);
         this.addWindowListener(onDialogClose());
     }
 

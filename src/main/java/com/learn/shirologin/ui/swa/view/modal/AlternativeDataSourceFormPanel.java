@@ -6,16 +6,12 @@
 package com.learn.shirologin.ui.swa.view.modal;
 
 import com.learn.shirologin.model.AlternativeDataSource;
-import com.learn.shirologin.model.StatusAlternative;
-import com.learn.shirologin.model.UserInfo;
 import com.learn.shirologin.ui.base.combobox.CheckedCombobox;
 import com.learn.shirologin.ui.swa.model.*;
-import com.learn.shirologin.ui.user.model.UserRoleComboBoxModel;
 import com.learn.shirologin.util.Borders;
 import com.learn.shirologin.util.IOFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
@@ -57,19 +53,31 @@ public class AlternativeDataSourceFormPanel extends JPanel{
     private JFileChooser jFileChooser;
     private AlternativeDataSource entity;
     @Getter
-    private JButton saveBtn;
+    private JButton loadBtn;
     @Getter
-    private JButton cancelBtn;
+    private JButton loadConventionBtn;
     @Getter
-    private JButton normalizeBtn;
+    private JButton loadNormalizationBtn;
     @Getter
-    private JPanel panelAlternative;
+    private JButton loadRankBtn;
     @Getter
     private JTable tableAlternativeDetail;
     @Getter
+    private JTable tableAlternativeConvention;
+    @Getter
+    private JTable tableAlternativeNormalization;
+    @Getter
+    private JTable tableAlternativeRankMatch;
+    @Getter
+    private JTabbedPane jTabbedPane;
+    @Getter
     private final AlternativeDetailTableModel alternativeDetailTableModel;
+    @Getter
+    private final AlternativeConventionTableModel alternativeConventionTableModel;
+    @Getter
+    private final AlternativeNormalizationTableModel aLternativeNormalizationTableModel;
 
-    
+
     @PostConstruct
     private void preparePanel(){
         setPanelUp();
@@ -92,35 +100,26 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         criteriaCombobox = new CheckedCombobox(criteriaComboBoxModel);
         jFileChooser = new JFileChooser();
         jFileChooser.setFileFilter(new FileNameExtensionFilter("Comma Separated Values (*.csv)", "csv"));
+        loadBtn = new JButton("Lanjut");
+        loadConventionBtn = new JButton("Lanjut ke Convention");
+        loadNormalizationBtn = new JButton("Lanjut ke Normalization");
+        loadRankBtn = new JButton("Hasil");
 
-        saveBtn = new JButton("Save");
-        cancelBtn = new JButton("Cancel");
-        normalizeBtn = new JButton("Normalize");
+        jTabbedPane = new JTabbedPane();
+        jTabbedPane.putClientProperty("JTabbedPane.tabClosable", false);
+        jTabbedPane.addTab("Tab 1",getDetailAlternativePanel());
+        jTabbedPane.addTab("Tab 2", getAlternativePanel());
+        jTabbedPane.addTab("Tab 3", getAlternativeConventionPanel());
+        jTabbedPane.addTab("Tab 4", getAlternativeNormalizationPanel());
+        jTabbedPane.addTab("Tab 5", getAlternativeRankMatchPanel());
 
-        panelAlternative = getAlternativePanel();
 
-        add(kodeLbl,"split 2,sg a");
-        add(kodeTxt,"pushx,growx,wrap");
-        add(tahunAjaranLbl,"split 2,sg a");
-        add(tahunAjaranComboBox,"pushx,growx,wrap");
-        add(jurusanLbl,"split 2, sg a");
-        add(jurusanComboBox,"pushx,growx,wrap");
-        add(kelasLbl,"split 2, sg a");
-        add(kelasComboBox,"pushx,growx,wrap");
-        add(dataSourceLbl,"split 3, sg a");
-        add(dataSourceFilenameLbl,"pushx,growx");
-        add(btnUploadDataSource, "wrap 10");
-        add(criteriaLbl, "split 2, sg a");
-        add(criteriaCombobox, "pushx,growx,wrap");
-        add(saveBtn, "split 3, align center");
-        add(cancelBtn, "align center");
-        add(normalizeBtn, "align center, wrap");
-        add(panelAlternative,"span 2, push , grow, wrap");
+        add(jTabbedPane);
     }
 
     private void setPanelUp() {
         setBorder(Borders.createEmptyBorder());
-        setLayout(new MigLayout("wrap 2","[] [grow]","[] [grow]"));
+        setLayout(new MigLayout("fill"));
     }
     
     public AlternativeDataSource getEntityFromForm(){
@@ -174,25 +173,89 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         enabledComponent(false);
     }
 
-    public void showAlternativeDetailTable(AlternativeDetailTableModel alternativeDetailTableModel){
-        tableAlternativeDetail.setModel(alternativeDetailTableModel);
-        panelAlternative.setVisible(true);
-    }
 
     private JPanel getAlternativePanel(){
         JPanel panel = new JPanel();
         panel.setLayout(new MigLayout("wrap 1","[grow]"));
-        panel.add(createTable(), "grow");
-        panel.setVisible(false);
+        panel.add(createTableAlternative(), "grow,wrap");
+        panel.add(loadConventionBtn, "align center, wrap");
         return panel;
     }
 
-    private JScrollPane createTable() {
+    private JPanel getAlternativeConventionPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 1","[grow]"));
+        panel.add(createTableAlternativeConvention(), "grow,wrap");
+        panel.add(loadNormalizationBtn, "align center, wrap");
+        return panel;
+    }
+
+    private JPanel getAlternativeNormalizationPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 1","[grow]"));
+        panel.add(createTableAlternativeNormalization(), "grow,wrap");
+        panel.add(loadRankBtn, "align center, wrap");
+        return panel;
+    }
+
+    private JPanel getAlternativeRankMatchPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 1","[grow]"));
+        panel.add(createTableAlternativeRankMatch(), "grow");
+        return panel;
+    }
+
+    private JPanel getDetailAlternativePanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 2","[] [grow]","[] [grow]"));
+
+        panel.add(kodeLbl,"split 2,sg a");
+        panel.add(kodeTxt,"pushx,growx,wrap");
+        panel.add(tahunAjaranLbl,"split 2,sg a");
+        panel.add(tahunAjaranComboBox,"pushx,growx,wrap");
+        panel.add(jurusanLbl,"split 2, sg a");
+        panel.add(jurusanComboBox,"pushx,growx,wrap");
+        panel.add(kelasLbl,"split 2, sg a");
+        panel.add(kelasComboBox,"pushx,growx,wrap");
+        panel.add(dataSourceLbl,"split 3, sg a");
+        panel.add(dataSourceFilenameLbl,"pushx,growx");
+        panel.add(btnUploadDataSource, "wrap 10");
+        panel.add(criteriaLbl, "split 2, sg a");
+        panel.add(criteriaCombobox, "pushx,growx,wrap");
+        panel.add(loadBtn, "align center,wrap");
+
+        return panel;
+    }
+
+    private JScrollPane createTableAlternative() {
         tableAlternativeDetail = new JTable();
         tableAlternativeDetail.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         tableAlternativeDetail.setFillsViewportHeight(true);
 
-        JScrollPane paneWithTable = new JScrollPane(tableAlternativeDetail);
-        return paneWithTable;
+        return new JScrollPane(tableAlternativeDetail);
+    }
+
+    private JScrollPane createTableAlternativeConvention() {
+        tableAlternativeConvention = new JTable();
+        tableAlternativeConvention.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableAlternativeConvention.setFillsViewportHeight(true);
+
+        return new JScrollPane(tableAlternativeConvention);
+    }
+
+    private JScrollPane createTableAlternativeNormalization() {
+        tableAlternativeNormalization = new JTable();
+        tableAlternativeNormalization.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableAlternativeNormalization.setFillsViewportHeight(true);
+
+        return new JScrollPane(tableAlternativeNormalization);
+    }
+
+    private JScrollPane createTableAlternativeRankMatch() {
+        tableAlternativeRankMatch = new JTable();
+        tableAlternativeRankMatch.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableAlternativeRankMatch.setFillsViewportHeight(true);
+
+        return new JScrollPane(tableAlternativeRankMatch);
     }
 }

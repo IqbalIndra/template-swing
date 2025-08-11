@@ -17,6 +17,7 @@ import java.awt.Toolkit;
 
 import com.learn.shirologin.util.ConstantParams;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -34,6 +35,7 @@ import javax.swing.*;
 @AllArgsConstructor
 public class LoginController extends AbstractFrameController{
     private final LoginPanel loginPanel;
+    @Getter
     private final MainFrame mainFrame;
     private final UserInfoService userInfoService;
     private final DashboardController dashboardController;

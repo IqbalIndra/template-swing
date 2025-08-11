@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class AlternativeDetailTableModel extends DefaultTableModel<List<Object>> {
+public class AlternativeNormalizationTableModel extends DefaultTableModel<List<Object>> {
     @Setter
     private String[] columnLabel;
 

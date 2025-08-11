@@ -13,6 +13,7 @@ import com.learn.shirologin.ui.base.controller.AbstractPanelController;
 import com.learn.shirologin.ui.swa.calculation.AlternativeCalculation;
 import com.learn.shirologin.ui.swa.model.*;
 import com.learn.shirologin.ui.swa.view.AlternativeDataSourceTablePaginationPanel;
+import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormBtnPanel;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormDialog;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormPanel;
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
@@ -64,6 +65,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     @PostConstruct
     private void prepareListeners(){
         AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        AlternativeDataSourceFormBtnPanel alternativeDataSourceFormBtnPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel();
 
         registerAction(alternativeDataSourceTablePaginationPanel.getBtnFirst(), (e) -> showFirstData());
         registerAction(alternativeDataSourceTablePaginationPanel.getBtnLast(), (e) -> showLastData());
@@ -73,15 +75,60 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         registerAction(alternativeDataSourceTablePaginationPanel.getBtnNew(), (e) -> showNewData());
         registerAction(alternativeDataSourceTablePaginationPanel.getBtnDelete(), this::deleteSelectedData);
         registerAction(alternativeDataSourceFormPanel.getBtnUploadDataSource(), (e)-> uploadDataSource());
-        registerAction(alternativeDataSourceFormPanel.getSaveBtn(), this::saveAlternativeDataSource);
-        registerAction(alternativeDataSourceFormPanel.getCancelBtn(), (e) -> cancelAlternativeDataSource());
-        registerAction(alternativeDataSourceFormPanel.getNormalizeBtn(), (e) -> tryNormalization());
+        registerAction(alternativeDataSourceFormBtnPanel.getSaveBtn(), this::saveAlternativeDataSource);
+        registerAction(alternativeDataSourceFormBtnPanel.getCancelBtn(), (e) -> cancelAlternativeDataSource());
+        registerAction(alternativeDataSourceFormPanel.getLoadBtn(), (e) -> fillToTable());
+        registerAction(alternativeDataSourceFormPanel.getLoadConventionBtn(), (e) -> tryConvention());
+        registerAction(alternativeDataSourceFormPanel.getLoadNormalizationBtn(), (e) -> tryNormalization());
+        registerAction(alternativeDataSourceFormPanel.getLoadRankBtn(), (e) -> tryRankMatch());
 
         registerMouseListener(alternativeDataSourceTablePaginationPanel.getTableAlternativeDataSource(), onClickedTableUser());
     }
 
+    private void tryRankMatch() {
+    }
+
+    private void fillToTable() {
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
+        AlternativeDataSource alternativeDataSource = alternativeDataSourceFormPanel.getEntityFromForm();
+
+        alternativeDetailTableModel.clearAll();
+        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
+        alternativeDataSourceFormPanel.getTableAlternativeDetail().setModel(alternativeDetailTableModel);
+
+        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(1);
+    }
+
+    private void tryConvention() {
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
+        AlternativeConventionTableModel alternativeConventionTableModel = alternativeDataSourceFormPanel.getAlternativeConventionTableModel();
+
+        List<List<Object>> dataConvention = alternativeCalculation.tryToConvention(criteriaComboBoxModel.getItemsSelected());
+        alternativeConventionTableModel.clearAll();
+        alternativeConventionTableModel.addDatas(dataConvention);
+        alternativeConventionTableModel.setColumnLabel(alternativeDetailTableModel.getColumnLabels());
+        alternativeDataSourceFormPanel.getTableAlternativeConvention().setModel(alternativeConventionTableModel);
+
+        AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        panel.getJTabbedPane().setSelectedIndex(2);
+    }
+
     private void tryNormalization() {
-        alternativeCalculation.tryToNormalization(criteriaComboBoxModel.getItemsSelected());
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        AlternativeConventionTableModel alternativeConventionTableModel = alternativeDataSourceFormPanel.getAlternativeConventionTableModel();
+        AlternativeNormalizationTableModel alternativeNormalizationTableModel = alternativeDataSourceFormPanel.getALternativeNormalizationTableModel();
+
+
+        List<List<Object>> dataNormalization = alternativeCalculation.tryToNormalization(criteriaComboBoxModel.getItemsSelected());
+        alternativeNormalizationTableModel.clearAll();
+        alternativeNormalizationTableModel.addDatas(dataNormalization);
+        alternativeNormalizationTableModel.setColumnLabel(alternativeConventionTableModel.getColumnLabels());
+        alternativeDataSourceFormPanel.getTableAlternativeNormalization().setModel(alternativeNormalizationTableModel);
+
+        AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        panel.getJTabbedPane().setSelectedIndex(3);
     }
 
     private void uploadDataSource() {
@@ -116,8 +163,9 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     private void showNewData() {
         alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().clearForm();
         alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().enabledComponent(true);
-        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getSaveBtn().setText("Save");
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel().getSaveBtn().setText("Save");
         alternativeDataSourceFormDialog.setLocationRelativeTo(alternativeDataSourceTablePaginationPanel);
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setSelectedIndex(0);
         alternativeDataSourceFormDialog.pack();
         alternativeDataSourceFormDialog.setVisible(true);
     }
@@ -151,8 +199,6 @@ public class AlternativeDataSourceController extends AbstractPanelController{
             //upload file immediately after save or update data to DB
             ioFile.createUploadFile(alternativeDataSource.getFileSource(),
                     alternativeDataSource.getFilename());
-
-            showAlternativeDetailView(alternativeDataSource);
         }
 
     }
@@ -163,9 +209,9 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
 
         loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
-        alternativeDataSourceFormPanel.showAlternativeDetailTable(alternativeDetailTableModel);
+        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(0);
 
-        alternativeDataSourceFormPanel.getSaveBtn().setText("Edit");
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel().getSaveBtn().setText("Edit");
         alternativeDataSourceFormPanel.enabledComponent(false);
 
         alternativeDataSourceFormDialog.pack();
@@ -201,25 +247,22 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     }
 
     private void cancelAlternativeDataSource() {
-        /*alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().clearForm();
-        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getSaveBtn().setText("Save");
-        alternativeDataSourceFormDialog.dispose();*/
-
-        alternativeCalculation.tryToConvention(criteriaComboBoxModel.getItemsSelected());
-
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().clearForm();
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel().getSaveBtn().setText("Save");
+        alternativeDataSourceFormDialog.dispose();
     }
 
     private void showViewData(AlternativeDataSource alternativeDataSource){
         AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
 
-        JButton jButton = alternativeDataSourceFormPanel.getSaveBtn();
+        JButton jButton = alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel().getSaveBtn();
         jButton.setText("Edit");
 
         alternativeDataSourceFormPanel.setEntityToForm(alternativeDataSource);
 
         AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
         loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
-        alternativeDataSourceFormPanel.showAlternativeDetailTable(alternativeDetailTableModel);
+        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(0);
 
         alternativeDataSourceFormDialog.setLocationRelativeTo(alternativeDataSourceTablePaginationPanel);
         alternativeDataSourceFormDialog.pack();
