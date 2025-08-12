@@ -12,9 +12,9 @@ public class SubCriteriaConvention implements Convention{
     @Override
     public boolean check(String operator, Double variable, Double minValue, Double maxValue) {
         if(operator.equals(OperatorType.GREATER_THAN.getSymbol()))
-            return variable >= maxValue;
+            return variable >= minValue;
         else if(operator.equals(OperatorType.LESS_THAN.getSymbol()))
-            return variable <= minValue;
+            return variable <= maxValue;
         else if(operator.equals(OperatorType.EQUALS.getSymbol()))
             return Objects.equals(variable, maxValue);
         else

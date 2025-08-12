@@ -76,6 +76,8 @@ public class AlternativeDataSourceFormPanel extends JPanel{
     private final AlternativeConventionTableModel alternativeConventionTableModel;
     @Getter
     private final AlternativeNormalizationTableModel aLternativeNormalizationTableModel;
+    @Getter
+    private final AlternativeRatingMatchTableModel alternativeRatingMatchTableModel;
 
 
     @PostConstruct
@@ -107,11 +109,11 @@ public class AlternativeDataSourceFormPanel extends JPanel{
 
         jTabbedPane = new JTabbedPane();
         jTabbedPane.putClientProperty("JTabbedPane.tabClosable", false);
-        jTabbedPane.addTab("Tab 1",getDetailAlternativePanel());
-        jTabbedPane.addTab("Tab 2", getAlternativePanel());
-        jTabbedPane.addTab("Tab 3", getAlternativeConventionPanel());
-        jTabbedPane.addTab("Tab 4", getAlternativeNormalizationPanel());
-        jTabbedPane.addTab("Tab 5", getAlternativeRankMatchPanel());
+        jTabbedPane.addTab("Detail",getDetailAlternativePanel());
+        jTabbedPane.addTab("Tabel Alternatif", getAlternativePanel());
+        jTabbedPane.addTab("Tabel Konversi", getAlternativeConventionPanel());
+        jTabbedPane.addTab("Tabel Normalisasi", getAlternativeNormalizationPanel());
+        jTabbedPane.addTab("Tabel Ranking", getAlternativeRankMatchPanel());
 
 
         add(jTabbedPane);
@@ -147,6 +149,7 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         tahunAjaranComboBox.setSelectedIndex(0);
         kelasComboBox.setSelectedIndex(0);
         dataSourceFilenameLbl.setText("Tidak ada file");
+        criteriaCombobox.setSelectedIndex(-1);
     }
 
     public void enabledComponent(boolean enabled){
@@ -156,6 +159,11 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         tahunAjaranComboBox.setEnabled(enabled);
         kelasComboBox.setEnabled(enabled);
         btnUploadDataSource.setEnabled(enabled);
+        criteriaCombobox.setEnabled(enabled);
+        loadBtn.setEnabled(enabled);
+        loadRankBtn.setEnabled(enabled);
+        loadNormalizationBtn.setEnabled(enabled);
+        loadConventionBtn.setEnabled(enabled);
     }
 
     public void setEntityToForm(AlternativeDataSource alternativeDataSource){

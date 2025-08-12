@@ -7,6 +7,7 @@ package com.learn.shirologin.ui.swa.controller;
 
 import com.learn.shirologin.model.AlternativeDataSource;
 import com.learn.shirologin.model.CriteriaItem;
+import com.learn.shirologin.model.RatingMatch;
 import com.learn.shirologin.service.AlternativeDataSourceService;
 import com.learn.shirologin.service.CriteriaService;
 import com.learn.shirologin.ui.base.controller.AbstractPanelController;
@@ -86,6 +87,19 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     }
 
     private void tryRankMatch() {
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        AlternativeNormalizationTableModel alternativeNormalizationTableModel = alternativeDataSourceFormPanel.getALternativeNormalizationTableModel();
+        AlternativeRatingMatchTableModel alternativeRatingMatchTableModel = alternativeDataSourceFormPanel.getAlternativeRatingMatchTableModel();
+
+
+        List<RatingMatch> dataRanking = alternativeCalculation.tryToRating(criteriaComboBoxModel.getItemsSelected());
+        alternativeRatingMatchTableModel.clearAll();
+        alternativeRatingMatchTableModel.addDatas(dataRanking);
+        alternativeDataSourceFormPanel.getTableAlternativeRankMatch().setModel(alternativeRatingMatchTableModel);
+
+        AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        panel.getJTabbedPane().setEnabledAt(panel.getJTabbedPane().getTabCount()-1, true);
+        panel.getJTabbedPane().setSelectedIndex(panel.getJTabbedPane().getTabCount()-1);
     }
 
     private void fillToTable() {
@@ -97,6 +111,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
         alternativeDataSourceFormPanel.getTableAlternativeDetail().setModel(alternativeDetailTableModel);
 
+        alternativeDataSourceFormPanel.getJTabbedPane().setEnabledAt(1,true);
         alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(1);
     }
 
@@ -112,6 +127,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         alternativeDataSourceFormPanel.getTableAlternativeConvention().setModel(alternativeConventionTableModel);
 
         AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        panel.getJTabbedPane().setEnabledAt(2,true);
         panel.getJTabbedPane().setSelectedIndex(2);
     }
 
@@ -128,6 +144,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         alternativeDataSourceFormPanel.getTableAlternativeNormalization().setModel(alternativeNormalizationTableModel);
 
         AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        panel.getJTabbedPane().setEnabledAt(3, true);
         panel.getJTabbedPane().setSelectedIndex(3);
     }
 
@@ -166,6 +183,10 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel().getSaveBtn().setText("Save");
         alternativeDataSourceFormDialog.setLocationRelativeTo(alternativeDataSourceTablePaginationPanel);
         alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setSelectedIndex(0);
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setEnabledAt(1,false);
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setEnabledAt(2,false);
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setEnabledAt(3,false);
+        alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setEnabledAt(4,false);
         alternativeDataSourceFormDialog.pack();
         alternativeDataSourceFormDialog.setVisible(true);
     }
@@ -201,20 +222,6 @@ public class AlternativeDataSourceController extends AbstractPanelController{
                     alternativeDataSource.getFilename());
         }
 
-    }
-
-    private void showAlternativeDetailView(AlternativeDataSource alternativeDataSource) {
-        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
-
-        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
-
-        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
-        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(0);
-
-        alternativeDataSourceFormDialog.getAlternativeDataSourceFormBtnPanel().getSaveBtn().setText("Edit");
-        alternativeDataSourceFormPanel.enabledComponent(false);
-
-        alternativeDataSourceFormDialog.pack();
     }
 
     private void loadAlternativeDetailData(AlternativeDetailTableModel alternativeDetailTableModel, File fileSource) {
