@@ -7,16 +7,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -177,5 +176,33 @@ public class CriteriaRepositoryImpl implements CriteriaRepository{
 
         }
         return criteriaItems;
+    }
+
+    @Override
+    public List<CriteriaItem> findCriteriaItemIn(long[] ids) {
+        if(Objects.isNull(ids) || ids.length == 0)
+            return new ArrayList<>();
+
+        List<CriteriaItem> items = new ArrayList<>();
+        String placeholders = String.join(",", Collections.nCopies(ids.length, "?"));
+        Object[] idx = Arrays.stream(ids)
+                .boxed().toArray();
+
+        List<Map<String,Object>> rows = jdbcTemplate.queryForList(
+                String.format("SELECT * FROM swa_criteria WHERE id IN (%s)",placeholders)
+                , idx
+        );
+
+        for(Map<String,Object> map : rows){
+            CriteriaItem criteriaItem = CriteriaItem.of().build();
+            criteriaItem.setType(CriteriaType.valueOfType((String)map.get("TYPE")));
+            criteriaItem.setWeight((Double) map.get("WEIGHT"));
+            criteriaItem.setSubCriteriaItems(new ArrayList<>());
+            criteriaItem.setId((Long)map.get("ID"));
+            criteriaItem.setText((String) map.get("NAME"));
+            items.add(criteriaItem);
+        }
+
+        return items;
     }
 }

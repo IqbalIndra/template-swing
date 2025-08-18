@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface CriteriaService {
     List<CriteriaItem> findCriteriaItem();
+    List<CriteriaItem> findCriteriaItemByIds(long[] ids);
     List<Criteria> findAll();
     Page<Criteria> findByPagination(Pageable pageable);
     Criteria save(Criteria criteria);

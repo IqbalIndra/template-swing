@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface CriteriaRepository extends BaseRepository<Long, Criteria>{
     List<CriteriaItem> findCriteriaItem();
+    List<CriteriaItem> findCriteriaItemIn(long[] ids);
 }

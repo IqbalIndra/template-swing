@@ -67,7 +67,7 @@ public class AlternativeCalculation {
                 CriteriaItem criteriaItem = criteria.get(columnCriteria);
                 Double variable = Double.parseDouble((String) datum.get(j));
 
-                Double total = 0d;
+                Double total;
                 if (criteriaItem.getType().equals(CriteriaType.BENEFIT)) {
                     total = alternativeConventionTableModel.getMaxDataByColumn(j);
                 } else {
@@ -108,8 +108,6 @@ public class AlternativeCalculation {
                 queue.add(ratingMatch);
             }
         }
-
-        System.out.println("Size Data : "+queue.size());
 
         int i =0;
         while(!queue.isEmpty()){

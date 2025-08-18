@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Builder(builderMethodName = "of")
@@ -19,6 +20,7 @@ public class AlternativeDataSource implements Serializable {
     private File fileSource;
     private String filename;
     private StatusAlternative status;
+    private long[] alternativeCriteria;
     private boolean deleted;
 
 }

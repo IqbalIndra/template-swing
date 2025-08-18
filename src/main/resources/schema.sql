@@ -61,5 +61,6 @@ create table swa_alternative_data_source (
       class_room varchar(10) not null,
       filename varchar(250) not null,
       status varchar(100) not null,
+      swa_criteria_id ARRAY not null,
       is_deleted boolean not null
 );

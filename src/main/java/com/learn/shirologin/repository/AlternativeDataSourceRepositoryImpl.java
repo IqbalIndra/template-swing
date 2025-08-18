@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Array;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -39,6 +40,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
                                             .id(rs.getLong("id"))
                                             .status(StatusAlternative.valueOfStatus(rs.getString("status")))
                                             .filename(rs.getString("filename"))
+                                            .alternativeCriteria((long[])rs.getArray("swa_criteria_id").getArray())
                                             .deleted(rs.getBoolean("is_deleted"))
                                             .build()
                             ),
@@ -53,8 +55,8 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
     @Override
     public AlternativeDataSource save(AlternativeDataSource alternativeDataSource) {
         String sql = "INSERT INTO swa_alternative_data_source (" +
-                "major,code,class_room,school_year,status,filename,is_deleted" +
-                ") VALUES (?,?,?,?,?,?,false) ";
+                "major,code,class_room,school_year,status,filename,swa_criteria_id,is_deleted" +
+                ") VALUES (?,?,?,?,?,?,?,false) ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
@@ -66,6 +68,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
             ps.setString(4, alternativeDataSource.getSchoolYear());
             ps.setString(5, alternativeDataSource.getStatus().name());
             ps.setString(6, alternativeDataSource.getFilename());
+            ps.setObject(7, alternativeDataSource.getAlternativeCriteria());
             return ps;
         }, keyHolder);
 
@@ -76,7 +79,8 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
 
     @Override
     public AlternativeDataSource update(AlternativeDataSource alternativeDataSource) {
-        String sql = "UPDATE swa_alternative_data_source SET major=?,code=?,class_room=?,school_year=?,status=?,filename=? WHERE id=? ";
+        String sql = "UPDATE swa_alternative_data_source SET major=?,code=?,class_room=?,school_year=?,status=?,filename=?," +
+                " swa_criteria_id=? WHERE id=? ";
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection
@@ -87,7 +91,8 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
             ps.setString(4, alternativeDataSource.getSchoolYear());
             ps.setString(5, alternativeDataSource.getStatus().name());
             ps.setString(6, alternativeDataSource.getFilename());
-            ps.setLong(7, alternativeDataSource.getId());
+            ps.setObject(7, alternativeDataSource.getAlternativeCriteria());
+            ps.setLong(8, alternativeDataSource.getId());
 
             return ps;
 
@@ -124,6 +129,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
                                 .schoolYear(rs.getString("school_year"))
                                 .id(rs.getLong("id"))
                                 .status(StatusAlternative.valueOfStatus(rs.getString("status")))
+                                .alternativeCriteria((long[])rs.getArray("swa_criteria_id").getArray())
                                 .filename(rs.getString("filename"))
                                 .deleted(rs.getBoolean("is_deleted"))
                                 .build()
@@ -153,6 +159,7 @@ public class AlternativeDataSourceRepositoryImpl implements AlternativeDataSourc
                         .schoolYear(rs.getString("school_year"))
                         .id(rs.getLong("id"))
                         .status(StatusAlternative.valueOfStatus(rs.getString("status")))
+                        .alternativeCriteria((long[])rs.getArray("swa_criteria_id").getArray())
                         .filename(rs.getString("filename"))
                         .deleted(rs.getBoolean("is_deleted"))
                         .build()

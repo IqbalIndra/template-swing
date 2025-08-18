@@ -6,12 +6,14 @@
 package com.learn.shirologin.ui.swa.view.modal;
 
 import com.learn.shirologin.model.AlternativeDataSource;
+import com.learn.shirologin.model.CriteriaItem;
 import com.learn.shirologin.ui.base.combobox.CheckedCombobox;
 import com.learn.shirologin.ui.swa.model.*;
 import com.learn.shirologin.util.Borders;
 import com.learn.shirologin.util.IOFile;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.miginfocom.swing.MigLayout;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
@@ -28,6 +30,7 @@ import java.util.Optional;
  */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class AlternativeDataSourceFormPanel extends JPanel{
     private final TahunAjaranComboBoxModel tahunAjaranComboBoxModel;
     private final JurusanComboBoxModel jurusanComboBoxModel;
@@ -115,7 +118,6 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         jTabbedPane.addTab("Tabel Normalisasi", getAlternativeNormalizationPanel());
         jTabbedPane.addTab("Tabel Ranking", getAlternativeRankMatchPanel());
 
-
         add(jTabbedPane);
     }
 
@@ -135,7 +137,14 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         entity.setSchoolYear(tahunAjaranComboBoxModel.getSelectedItem());
         entity.setClassRoom(kelasComboBoxModel.getSelectedItem());
         entity.setFileSource(jFileChooser.getSelectedFile());
-        entity.setFilename(jFileChooser.getSelectedFile().getName());
+        entity.setFilename(jFileChooser.getSelectedFile() == null ? Strings.EMPTY : jFileChooser.getSelectedFile().getName());
+        long[] criteriaIds = criteriaComboBoxModel
+                .getItemsSelected()
+                .stream()
+                .mapToLong(CriteriaItem::getId)
+                        .toArray();
+
+        entity.setAlternativeCriteria(criteriaIds);
 
 
         return entity;
@@ -149,7 +158,7 @@ public class AlternativeDataSourceFormPanel extends JPanel{
         tahunAjaranComboBox.setSelectedIndex(0);
         kelasComboBox.setSelectedIndex(0);
         dataSourceFilenameLbl.setText("Tidak ada file");
-        criteriaCombobox.setSelectedIndex(-1);
+        criteriaComboBoxModel.clearSelection();
     }
 
     public void enabledComponent(boolean enabled){

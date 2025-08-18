@@ -42,10 +42,19 @@ public class DefaultAbstractCheckedComboBoxModel<E extends CheckItem> extends De
     }
 
     public void setItemsSelected(List<E> items){
-        Set<E> unique = new HashSet<>(items);
+        Set<String> unique = items.stream()
+                .map(CheckItem::getText)
+                .collect(Collectors.toSet());
+
         IntStream.range(0, this.getSize())
                 .mapToObj(this::getElementAt)
-                .filter(unique::contains)
+                .filter(o -> unique.contains(o.getText()))
                 .forEach(e -> e.setSelected(true));
+    }
+
+    public void clearSelection(){
+        IntStream.range(0, this.getSize())
+                .mapToObj(this::getElementAt)
+                .forEach(e -> e.setSelected(false));
     }
 }

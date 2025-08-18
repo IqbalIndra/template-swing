@@ -21,6 +21,11 @@ public class CriteriaServiceImpl implements CriteriaService{
     }
 
     @Override
+    public List<CriteriaItem> findCriteriaItemByIds(long[] ids) {
+        return criteriaRepository.findCriteriaItemIn(ids);
+    }
+
+    @Override
     public List<Criteria> findAll() {
         return criteriaRepository.findAll();
     }

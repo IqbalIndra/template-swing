@@ -5,6 +5,7 @@
  */
 package com.learn.shirologin.ui.swa.controller;
 
+import com.learn.shirologin.common.validation.ValidationError;
 import com.learn.shirologin.model.AlternativeDataSource;
 import com.learn.shirologin.model.CriteriaItem;
 import com.learn.shirologin.model.RatingMatch;
@@ -13,12 +14,14 @@ import com.learn.shirologin.service.CriteriaService;
 import com.learn.shirologin.ui.base.controller.AbstractPanelController;
 import com.learn.shirologin.ui.swa.calculation.AlternativeCalculation;
 import com.learn.shirologin.ui.swa.model.*;
+import com.learn.shirologin.ui.swa.validation.AlternativeDataSourceValidator;
 import com.learn.shirologin.ui.swa.view.AlternativeDataSourceTablePaginationPanel;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormBtnPanel;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormDialog;
 import com.learn.shirologin.ui.swa.view.modal.AlternativeDataSourceFormPanel;
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
 import com.learn.shirologin.util.IOFile;
+import com.learn.shirologin.util.Notifications;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,6 +43,7 @@ import java.io.FileReader;
 import java.time.Year;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -62,6 +66,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     private final KelasComboBoxModel kelasComboBoxModel;
     private final JurusanComboBoxModel jurusanComboBoxModel;
     private final CriteriaComboBoxModel criteriaComboBoxModel;
+    private final AlternativeDataSourceValidator alternativeDataSourceValidator;
     
     @PostConstruct
     private void prepareListeners(){
@@ -88,14 +93,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
 
     private void tryRankMatch() {
         AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
-        AlternativeNormalizationTableModel alternativeNormalizationTableModel = alternativeDataSourceFormPanel.getALternativeNormalizationTableModel();
-        AlternativeRatingMatchTableModel alternativeRatingMatchTableModel = alternativeDataSourceFormPanel.getAlternativeRatingMatchTableModel();
-
-
-        List<RatingMatch> dataRanking = alternativeCalculation.tryToRating(criteriaComboBoxModel.getItemsSelected());
-        alternativeRatingMatchTableModel.clearAll();
-        alternativeRatingMatchTableModel.addDatas(dataRanking);
-        alternativeDataSourceFormPanel.getTableAlternativeRankMatch().setModel(alternativeRatingMatchTableModel);
+        loadFillRankMatchTable(alternativeDataSourceFormPanel);
 
         AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
         panel.getJTabbedPane().setEnabledAt(panel.getJTabbedPane().getTabCount()-1, true);
@@ -107,24 +105,23 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
         AlternativeDataSource alternativeDataSource = alternativeDataSourceFormPanel.getEntityFromForm();
 
-        alternativeDetailTableModel.clearAll();
-        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
-        alternativeDataSourceFormPanel.getTableAlternativeDetail().setModel(alternativeDetailTableModel);
+        Optional<ValidationError> validator = alternativeDataSourceValidator.validate(alternativeDataSource);
+        if(validator.isPresent()){
+            Notifications.showFormValidationAlert(alternativeDataSourceFormPanel,"Error" , validator.get().getMessage());
+        }else{
+            alternativeDetailTableModel.clearAll();
+            loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
+            alternativeDataSourceFormPanel.getTableAlternativeDetail().setModel(alternativeDetailTableModel);
 
-        alternativeDataSourceFormPanel.getJTabbedPane().setEnabledAt(1,true);
-        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(1);
+            alternativeDataSourceFormPanel.getJTabbedPane().setEnabledAt(1,true);
+            alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(1);
+        }
+
     }
 
     private void tryConvention() {
         AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
-        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
-        AlternativeConventionTableModel alternativeConventionTableModel = alternativeDataSourceFormPanel.getAlternativeConventionTableModel();
-
-        List<List<Object>> dataConvention = alternativeCalculation.tryToConvention(criteriaComboBoxModel.getItemsSelected());
-        alternativeConventionTableModel.clearAll();
-        alternativeConventionTableModel.addDatas(dataConvention);
-        alternativeConventionTableModel.setColumnLabel(alternativeDetailTableModel.getColumnLabels());
-        alternativeDataSourceFormPanel.getTableAlternativeConvention().setModel(alternativeConventionTableModel);
+        loadFillConventionTable(alternativeDataSourceFormPanel);
 
         AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
         panel.getJTabbedPane().setEnabledAt(2,true);
@@ -133,15 +130,7 @@ public class AlternativeDataSourceController extends AbstractPanelController{
 
     private void tryNormalization() {
         AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
-        AlternativeConventionTableModel alternativeConventionTableModel = alternativeDataSourceFormPanel.getAlternativeConventionTableModel();
-        AlternativeNormalizationTableModel alternativeNormalizationTableModel = alternativeDataSourceFormPanel.getALternativeNormalizationTableModel();
-
-
-        List<List<Object>> dataNormalization = alternativeCalculation.tryToNormalization(criteriaComboBoxModel.getItemsSelected());
-        alternativeNormalizationTableModel.clearAll();
-        alternativeNormalizationTableModel.addDatas(dataNormalization);
-        alternativeNormalizationTableModel.setColumnLabel(alternativeConventionTableModel.getColumnLabels());
-        alternativeDataSourceFormPanel.getTableAlternativeNormalization().setModel(alternativeNormalizationTableModel);
+        loadFillNormalizationTable(alternativeDataSourceFormPanel);
 
         AlternativeDataSourceFormPanel panel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
         panel.getJTabbedPane().setEnabledAt(3, true);
@@ -196,31 +185,41 @@ public class AlternativeDataSourceController extends AbstractPanelController{
 
         if(!button.getText().equalsIgnoreCase("save")){
             alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().enabledComponent(true);
+            alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel().getJTabbedPane().setSelectedIndex(0);
             button.setText("Save");
             return;
         }
 
-        int confirm = JOptionPane.showConfirmDialog(alternativeDataSourceFormDialog,"Are you want to save this data ?","Confirm",JOptionPane.OK_CANCEL_OPTION);
-        if(confirm == JOptionPane.OK_OPTION){
-            AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
-            AlternativeDataSource alternativeDataSource = alternativeDataSourceFormPanel.getEntityFromForm();
+        AlternativeDataSourceFormPanel alternativeDataSourceFormPanel = alternativeDataSourceFormDialog.getAlternativeDataSourceFormPanel();
+        AlternativeDataSource alternativeDataSource = alternativeDataSourceFormPanel.getEntityFromForm();
+        Optional<ValidationError> validator = alternativeDataSourceValidator.validate(alternativeDataSource);
 
-            if(!ObjectUtils.isEmpty(alternativeDataSource.getId())){
-                alternativeDataSourceService.update(alternativeDataSource);
-                alternativeDataSourceTableModel.updateData(
-                        alternativeDataSourceTablePaginationPanel
-                                .getTableAlternativeDataSource()
-                                .getSelectedRow(),
-                        alternativeDataSource);
-            }else{
-                alternativeDataSourceService.save(alternativeDataSource);
-                alternativeDataSourceTableModel.addData(alternativeDataSource);
+        if(validator.isPresent()){
+            Notifications.showFormValidationAlert(alternativeDataSourceFormPanel, "Error",validator.get().getMessage());
+        }else{
+            int confirm = JOptionPane.showConfirmDialog(alternativeDataSourceFormDialog,"Are you want to save this data ?","Confirm",JOptionPane.OK_CANCEL_OPTION);
+            if(confirm == JOptionPane.OK_OPTION){
+                if(!ObjectUtils.isEmpty(alternativeDataSource.getId())){
+                    alternativeDataSourceService.update(alternativeDataSource);
+                    alternativeDataSourceTableModel.updateData(
+                            alternativeDataSourceTablePaginationPanel
+                                    .getTableAlternativeDataSource()
+                                    .getSelectedRow(),
+                            alternativeDataSource);
+                }else{
+                    alternativeDataSourceService.save(alternativeDataSource);
+                    alternativeDataSourceTableModel.addData(alternativeDataSource);
+                }
+
+                //upload file immediately after save or update data to DB
+                ioFile.createUploadFile(alternativeDataSource.getFileSource(),
+                        alternativeDataSource.getFilename());
+
+                cancelAlternativeDataSource();
             }
-
-            //upload file immediately after save or update data to DB
-            ioFile.createUploadFile(alternativeDataSource.getFileSource(),
-                    alternativeDataSource.getFilename());
         }
+
+
 
     }
 
@@ -236,11 +235,8 @@ public class AlternativeDataSourceController extends AbstractPanelController{
 
             alternativeDetailTableModel.setColumnLabel(columnsName);
 
-            // get lines from txt file
             Object[] tableLines = br.lines().toArray();
 
-            // extratct data from lines
-            // set data to jtable model
             for(int i = 0; i < tableLines.length; i++)
             {
                 String line = tableLines[i].toString().trim();
@@ -267,13 +263,52 @@ public class AlternativeDataSourceController extends AbstractPanelController{
 
         alternativeDataSourceFormPanel.setEntityToForm(alternativeDataSource);
 
-        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
-        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
-        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(0);
+        List<CriteriaItem> itemSelected = criteriaService.findCriteriaItemByIds(alternativeDataSource.getAlternativeCriteria());
+        criteriaComboBoxModel.setItemsSelected(itemSelected);
 
+        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
+        alternativeDetailTableModel.clearAll();
+        loadAlternativeDetailData(alternativeDetailTableModel,alternativeDataSource.getFileSource());
+        loadFillConventionTable(alternativeDataSourceFormPanel);
+        loadFillNormalizationTable(alternativeDataSourceFormPanel);
+        loadFillRankMatchTable(alternativeDataSourceFormPanel);
+
+
+        alternativeDataSourceFormPanel.getJTabbedPane().setSelectedIndex(0);
         alternativeDataSourceFormDialog.setLocationRelativeTo(alternativeDataSourceTablePaginationPanel);
         alternativeDataSourceFormDialog.pack();
         alternativeDataSourceFormDialog.setVisible(true);
+    }
+
+    private void loadFillRankMatchTable(AlternativeDataSourceFormPanel alternativeDataSourceFormPanel){
+        AlternativeRatingMatchTableModel alternativeRatingMatchTableModel = alternativeDataSourceFormPanel.getAlternativeRatingMatchTableModel();
+
+        List<RatingMatch> dataRanking = alternativeCalculation.tryToRating(criteriaComboBoxModel.getItemsSelected());
+        alternativeRatingMatchTableModel.clearAll();
+        alternativeRatingMatchTableModel.addDatas(dataRanking);
+        alternativeDataSourceFormPanel.getTableAlternativeRankMatch().setModel(alternativeRatingMatchTableModel);
+    }
+
+    private void loadFillNormalizationTable(AlternativeDataSourceFormPanel alternativeDataSourceFormPanel) {
+        AlternativeConventionTableModel alternativeConventionTableModel = alternativeDataSourceFormPanel.getAlternativeConventionTableModel();
+        AlternativeNormalizationTableModel alternativeNormalizationTableModel = alternativeDataSourceFormPanel.getALternativeNormalizationTableModel();
+
+        List<List<Object>> dataNormalization = alternativeCalculation.tryToNormalization(criteriaComboBoxModel.getItemsSelected());
+        alternativeNormalizationTableModel.clearAll();
+        alternativeNormalizationTableModel.addDatas(dataNormalization);
+        alternativeNormalizationTableModel.setColumnLabel(alternativeConventionTableModel.getColumnLabels());
+        alternativeDataSourceFormPanel.getTableAlternativeNormalization().setModel(alternativeNormalizationTableModel);
+    }
+
+    private void loadFillConventionTable(AlternativeDataSourceFormPanel alternativeDataSourceFormPanel) {
+        AlternativeConventionTableModel alternativeConventionTableModel = alternativeDataSourceFormPanel.getAlternativeConventionTableModel();
+        AlternativeDetailTableModel alternativeDetailTableModel = alternativeDataSourceFormPanel.getAlternativeDetailTableModel();
+
+        List<List<Object>> dataConvention = alternativeCalculation.tryToConvention(criteriaComboBoxModel.getItemsSelected());
+        alternativeConventionTableModel.clearAll();
+        alternativeConventionTableModel.addDatas(dataConvention);
+        alternativeConventionTableModel.setColumnLabel(alternativeDetailTableModel.getColumnLabels());
+        alternativeDataSourceFormPanel.getTableAlternativeConvention().setModel(alternativeConventionTableModel);
     }
 
 
