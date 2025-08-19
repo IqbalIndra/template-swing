@@ -8,12 +8,8 @@ package com.learn.shirologin.ui.user.view;
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
 import com.learn.shirologin.ui.user.model.UserTableModel;
 import javax.annotation.PostConstruct;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
+import javax.swing.*;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
@@ -37,7 +33,6 @@ public class UserTablePaginationPanel extends JPanel{
     private JButton btnViewReport;
     private JTable tableUser;
     private final UserTableModel userTableModel;
-    private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     
     @PostConstruct
     private void preparePanel(){
@@ -77,7 +72,9 @@ public class UserTablePaginationPanel extends JPanel{
         JPanel panel = new JPanel();
         btnLast = new JButton("Last");
         btnNext = new JButton(">");
-        cbxPagePerSize = new JComboBox(userPaginationComboBoxModel);
+        cbxPagePerSize = new JComboBox<>(new DefaultComboBoxModel<>(
+                new Integer[]{5, 10, 20, 30, 50}
+        ));
         
         btnPrevious = new JButton("<");
         btnFirst = new JButton("First");

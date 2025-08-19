@@ -51,7 +51,6 @@ public class UserController extends AbstractPanelController{
     private final UserTablePaginationPanel userTablePaginationPanel;
     private final UserInfoFormDialog userInfoFormDialog;
     private final UserTableModel userTableModel;
-    private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     private final UserRoleComboBoxModel userRoleComboBoxModel;
     private final UserInfoService userInfoService;
     private final JasperReport userInfoReport;
@@ -156,7 +155,6 @@ public class UserController extends AbstractPanelController{
     public JPanel prepareAndGetPanel() {
         Pageable pageable = PageRequest.of(0, 10);
         loadEntities(pageable);
-        loadPaginationComboBox();
         loadRoleComboBox();
         return userTablePaginationPanel;
     }
@@ -168,21 +166,16 @@ public class UserController extends AbstractPanelController{
         userTablePaginationPanel.getBtnLast().setEnabled((!pageUserInfo.isLast()));
     }
 
-    private void loadPaginationComboBox() {
-        userPaginationComboBoxModel.removeAllElements();
-        userPaginationComboBoxModel.addElements(Arrays.asList(new Integer[] {10,20,30,50,100}));
-    }
-
     private void showDataPerPageSize(ActionEvent e) {
-        Integer pageSize = userPaginationComboBoxModel.getSelectedItem();
-        if(!ObjectUtils.isEmpty(pageUserInfo) || !pageUserInfo.isEmpty()){
+        Integer pageSize = (Integer) userTablePaginationPanel.getCbxPagePerSize().getSelectedItem();
+        if(pageUserInfo != null){
             Pageable pageable = PageRequest.of(pageUserInfo.getNumber(), pageSize);
             loadEntities(pageable);
         }
     }
 
     private void loadRoleComboBox() {
-        userRoleComboBoxModel.removeAllElements();
+        userRoleComboBoxModel.clear();
         userRoleComboBoxModel.addElements(Arrays.asList(Role.values()));
     }
 

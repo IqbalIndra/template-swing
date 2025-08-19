@@ -56,7 +56,6 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     private final AlternativeDataSourceTablePaginationPanel alternativeDataSourceTablePaginationPanel;
     private final AlternativeDataSourceFormDialog alternativeDataSourceFormDialog;
     private final AlternativeDataSourceTableModel alternativeDataSourceTableModel;
-    private final UserPaginationComboBoxModel userPaginationComboBoxModel;
     private final AlternativeDataSourceService alternativeDataSourceService;
     private final CriteriaService criteriaService;
     private final AlternativeCalculation alternativeCalculation;
@@ -348,7 +347,6 @@ public class AlternativeDataSourceController extends AbstractPanelController{
     public JPanel prepareAndGetPanel() {
         Pageable pageable = PageRequest.of(0, 10);
         loadEntities(pageable);
-        loadPaginationComboBox();
         loadTahunAjaranComboBox();
         loadKelasComboBox();
         loadJurusanComboBox();
@@ -387,14 +385,10 @@ public class AlternativeDataSourceController extends AbstractPanelController{
         alternativeDataSourceTablePaginationPanel.getBtnLast().setEnabled((!pageAlternativeDataSource.isLast()));
     }
 
-    private void loadPaginationComboBox() {
-        userPaginationComboBoxModel.removeAllElements();
-        userPaginationComboBoxModel.addElements(Arrays.asList(new Integer[] {10,20,30,50,100}));
-    }
 
     private void showDataPerPageSize(ActionEvent e) {
-        Integer pageSize = userPaginationComboBoxModel.getSelectedItem();
-        if(!ObjectUtils.isEmpty(pageAlternativeDataSource) || !pageAlternativeDataSource.isEmpty()){
+        Integer pageSize = (Integer) alternativeDataSourceTablePaginationPanel.getCbxPagePerSize().getSelectedItem();
+        if(pageAlternativeDataSource != null){
             Pageable pageable = PageRequest.of(pageAlternativeDataSource.getNumber(), pageSize);
             loadEntities(pageable);
         }

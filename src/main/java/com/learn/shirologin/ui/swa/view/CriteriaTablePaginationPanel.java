@@ -5,7 +5,7 @@
  */
 package com.learn.shirologin.ui.swa.view;
 
-import com.learn.shirologin.ui.swa.model.AlternativeDataSourceTableModel;
+import com.learn.shirologin.ui.swa.model.CriteriaTableModel;
 import com.learn.shirologin.ui.user.model.UserPaginationComboBoxModel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import javax.swing.*;
 @Component
 @Getter
 @RequiredArgsConstructor
-public class AlternativeDataSourceTablePaginationPanel extends JPanel{
+public class CriteriaTablePaginationPanel extends JPanel{
     private JButton btnLast;
     private JButton btnNext;
     private JComboBox<Integer> cbxPagePerSize;
@@ -30,9 +30,8 @@ public class AlternativeDataSourceTablePaginationPanel extends JPanel{
     private JButton btnFirst;
     private JButton btnNew;
     private JButton btnDelete;
-    private JButton btnViewReport;
-    private JTable tableAlternativeDataSource;
-    private final AlternativeDataSourceTableModel alternativeDataSourceTableModel;
+    private JTable tableCriteria;
+    private final CriteriaTableModel criteriaTableModel;
     
     @PostConstruct
     private void preparePanel(){
@@ -47,24 +46,23 @@ public class AlternativeDataSourceTablePaginationPanel extends JPanel{
 
     private JPanel createPanelPagination() {
         JPanel panel = new JPanel();
-        MigLayout migLayout = new MigLayout("wrap 4","[grow][][][]");
+        MigLayout migLayout = new MigLayout("wrap 4","[grow][][]");
         panel.setLayout(migLayout);
         
         JPanel panelLeft = createPanelLeftPagination();
         panel.add(panelLeft,"left");
         panel.add(btnNew,"right");
         panel.add(btnDelete,"right");
-        panel.add(btnViewReport,"right");
 
         return panel;
     }
 
     private JScrollPane createTable() {
-        tableAlternativeDataSource = new JTable(alternativeDataSourceTableModel);
-        tableAlternativeDataSource.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        tableAlternativeDataSource.setFillsViewportHeight(true);
+        tableCriteria = new JTable(criteriaTableModel);
+        tableCriteria.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tableCriteria.setFillsViewportHeight(true);
         
-        JScrollPane paneWithTable = new JScrollPane(tableAlternativeDataSource);
+        JScrollPane paneWithTable = new JScrollPane(tableCriteria);
         return paneWithTable;
     }
 
@@ -80,7 +78,6 @@ public class AlternativeDataSourceTablePaginationPanel extends JPanel{
         btnFirst = new JButton("First");
         btnNew = new JButton("New");
         btnDelete = new JButton("Delete");
-        btnViewReport = new JButton("View Report");
 
         panel.add(btnLast);
         panel.add(btnNext);

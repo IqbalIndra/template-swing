@@ -5,8 +5,6 @@
  */
 package com.learn.shirologin.domain.menu.service;
 
-import com.learn.shirologin.domain.menu.model.TreeMenu;
-import java.util.List;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
@@ -14,5 +12,5 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author KBDSI-IQBAL
  */
 public interface TreeMenuService {
-    void createNodes(DefaultMutableTreeNode root);
+    DefaultMutableTreeNode createNodes();
 }

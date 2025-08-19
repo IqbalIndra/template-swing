@@ -34,7 +34,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository{
                                             .name(rs.getString("name"))
                                             .weight(rs.getDouble("weight"))
                                             .id(rs.getLong("id"))
-                                            .type(CriteriaType.valueOfType(rs.getString("")))
+                                            .type(CriteriaType.valueOfType(rs.getString("type")))
                                             .deleted(rs.getBoolean("is_deleted"))
                                             .build()
                             ),
@@ -57,7 +57,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository{
             PreparedStatement ps = connection
                     .prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, criteria.getName());
-            ps.setString(2, criteria.getType().name());
+            ps.setString(2, criteria.getType().getName());
             ps.setDouble(3, criteria.getWeight());
             return ps;
         }, keyHolder);
@@ -75,7 +75,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository{
             PreparedStatement ps = connection
                     .prepareStatement(sql);
             ps.setString(1, criteria.getName());
-            ps.setString(2, criteria.getType().name());
+            ps.setString(2, criteria.getType().getName());
             ps.setDouble(3, criteria.getWeight());
             ps.setLong(4, criteria.getId());
 
@@ -108,7 +108,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository{
                                 .name(rs.getString("name"))
                                 .weight(rs.getDouble("weight"))
                                 .id(rs.getLong("id"))
-                                .type(CriteriaType.valueOfType(rs.getString("")))
+                                .type(CriteriaType.valueOfType(rs.getString("type")))
                                 .deleted(rs.getBoolean("is_deleted"))
                                 .build()
 
@@ -134,7 +134,7 @@ public class CriteriaRepositoryImpl implements CriteriaRepository{
                         .name(rs.getString("name"))
                         .weight(rs.getDouble("weight"))
                         .id(rs.getLong("id"))
-                        .type(CriteriaType.valueOfType(rs.getString("")))
+                        .type(CriteriaType.valueOfType(rs.getString("type")))
                         .deleted(rs.getBoolean("is_deleted"))
                         .build()
         );

@@ -14,6 +14,7 @@ import com.learn.shirologin.util.ApplicationContextHolder;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import javax.swing.JPanel;
@@ -26,6 +27,7 @@ import com.learn.shirologin.util.ConstantParams;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ObjectUtils;
 
 /**
  *
@@ -48,13 +50,12 @@ public class DashboardController extends AbstractFrameController{
     }
 
     private void loadTreeMenu() {
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("#");
-        treeMenuService.createNodes(root);
+        DefaultMutableTreeNode nodes = treeMenuService.createNodes();
         JTree jTree = dashboardPanel.getTreeMenu();
-        jTree.setModel(new DefaultTreeModel(root));
+        jTree.setModel(new DefaultTreeModel(nodes));
     }
 
-    private void showMenu() {
+    private void showMenu()  {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode)
                        dashboardPanel.getTreeMenu().getLastSelectedPathComponent();
         
@@ -65,25 +66,27 @@ public class DashboardController extends AbstractFrameController{
         if (node.isLeaf()) {
             Object nodeInfo = node.getUserObject();
             TreeMenu menu = (TreeMenu) nodeInfo;
-            
-            try {
-                JTabbedPane tabbedPane = dashboardPanel.getTabbedPaneRight();
-                int indexTab = getTabbedIndex(tabbedPane , menu.getName());
-                
-                if(indexTab > -1){
-                    tabbedPane.setSelectedIndex(indexTab);
-                }else{
-                    Class classe = Class.forName(menu.getPath());
-                    Object obj = ApplicationContextHolder.getBean(classe);
-                    Method method = classe.getDeclaredMethod("prepareAndGetPanel", (Class[]) null);
-                    JPanel panel = (JPanel) method.invoke(obj, (Object[]) null);
 
-                    tabbedPane.addTab(menu.getName(), panel);
-                    tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
+            JTabbedPane tabbedPane = dashboardPanel.getTabbedPaneRight();
+            int indexTab = getTabbedIndex(tabbedPane , menu.getName());
+
+            if(indexTab > -1){
+                tabbedPane.setSelectedIndex(indexTab);
+            }else {
+                if(!ObjectUtils.isEmpty(menu.getPath())){
+                    try{
+                        Class classe = Class.forName(menu.getPath());
+                        Object obj = ApplicationContextHolder.getBean(classe);
+                        Method method = classe.getDeclaredMethod("prepareAndGetPanel", (Class[]) null);
+                        JPanel panel = (JPanel) method.invoke(obj, (Object[]) null);
+
+                        tabbedPane.addTab(menu.getName(), panel);
+                        tabbedPane.setSelectedIndex(tabbedPane.getTabCount()-1);
+                    }catch (Exception e){
+                        throw new RuntimeException(e);
+                    }
+
                 }
-                   
-            } catch (Exception ex) {
-                log.error("Error Get Class Not Found =>{}",ex.getMessage());
             }
            
         }
