@@ -46,6 +46,12 @@ public class TreeMenuServiceImpl implements TreeMenuService{
         ));
         treeMenus.add(new TreeMenu(
                 "GC002",
+                "Sub Kriteria",
+                "C002",
+                "com.learn.shirologin.ui.swa.controller.SubCriteriaController"
+        ));
+        treeMenus.add(new TreeMenu(
+                "GC003",
                 "Perhitungan Peringkat",
                 "C002",
                 "com.learn.shirologin.ui.swa.controller.AlternativeDataSourceController"

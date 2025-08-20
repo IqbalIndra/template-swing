@@ -11,6 +11,7 @@ import lombok.Setter;
 @Builder(builderMethodName = "of")
 public class SubCriteria {
     private Long id;
+    private Criteria criteria;
     private String name;
     private OperatorType operator;
     private Double weight;

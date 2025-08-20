@@ -12,4 +12,9 @@ public class Criteria {
     private CriteriaType type;
     private Double weight;
     private boolean deleted;
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 }
